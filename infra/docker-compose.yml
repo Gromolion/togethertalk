@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ../frontend
+      dockerfile: ../infra/frontend/Dockerfile
+    volumes:
+      - ../frontend:/usr/src/app
+    restart: always
+    ports:
+      - "8000:8080"
+    depends_on:
+      - backend
+  backend:
+    container_name: backend
+    build:
+      context: ../backend
+      dockerfile: ../infra/backend/Dockerfile
+    volumes:
+      - ../backend:/usr/src/app
+    depends_on:
+      - db
+    restart: always
+    ports:
+      - "3000:3000"
+  db:
+    container_name: db
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=togethertalk
+      - POSTGRES_PASSWORD=togethertalk
+      - POSTGRES_DB=togethertalk
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U togethertalk -d togethertalk" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
