@@ -10,4 +10,6 @@ RUN npm init -y & \
 COPY . .
 
 EXPOSE 3000
+CMD [ "npm", "run", "lint"]
+CMD [ "npm", "run", "format"]
 CMD [ "npm", "run", "start:dev"]
