@@ -5,7 +5,8 @@ WORKDIR /usr/src/app
 COPY ./package*.json ./
 
 RUN npm init -y & \
-    npm install
+    npm install & \
+    npm i -g @nestjs/cli
 
 COPY . .
 
