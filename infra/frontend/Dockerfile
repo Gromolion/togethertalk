@@ -10,5 +10,4 @@ RUN npm init -y & \
 COPY . .
 
 EXPOSE 8080
-CMD [ "npm", "run", "lint"]
-CMD [ "npm", "run", "dev.host"]
+CMD [ "npm", "run", "serve"]
