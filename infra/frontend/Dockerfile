@@ -5,7 +5,10 @@ WORKDIR /usr/src/app
 COPY ./package*.json ./
 
 RUN npm init -y & \
-    npm install
+    npm install & \
+    chown 1000:1000 -R /usr/src/app
+
+USER 1000
 
 COPY . .
 
