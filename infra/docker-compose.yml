@@ -22,6 +22,7 @@ services:
       - ../backend:/usr/src/app
     depends_on:
       - postgres
+      - mongo
     restart: always
     ports:
       - "3000:3000"
@@ -35,7 +36,7 @@ services:
       - POSTGRES_PASSWORD=togethertalk
       - POSTGRES_DB=togethertalk
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ./databases/postgres:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U togethertalk -d togethertalk" ]
       interval: 10s
@@ -43,3 +44,13 @@ services:
       retries: 5
       start_period: 10s
     restart: unless-stopped
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: togethertalk
+      MONGO_INITDB_ROOT_PASSWORD: togethertalk
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./databases/mongo:/data/db
