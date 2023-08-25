@@ -21,12 +21,12 @@ services:
     volumes:
       - ../backend:/usr/src/app
     depends_on:
-      - db
+      - postgres
     restart: always
     ports:
       - "3000:3000"
-  db:
-    container_name: db
+  postgres:
+    container_name: postgres
     image: postgres
     ports:
       - "5432:5432"
