@@ -6,8 +6,7 @@ COPY ./package*.json ./
 
 RUN npm init -y & \
     npm install & \
-    npm i -g @nestjs/cli & \
-    chown 1000:1000 -R /usr/src/app
+    npm i -g @nestjs/cli
 
 USER 1000
 
