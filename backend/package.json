@@ -32,6 +32,7 @@
     "class-validator": "^0.14.0",
     "js-yaml": "^4.1.0",
     "mongoose": "^7.4.4",
+    "peer": "^1.0.1",
     "pg": "^8.11.3",
     "postgresql": "^0.0.1",
     "reflect-metadata": "^0.1.13",
