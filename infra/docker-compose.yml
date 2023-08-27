@@ -50,6 +50,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: togethertalk
       MONGO_INITDB_ROOT_PASSWORD: togethertalk
+    restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
