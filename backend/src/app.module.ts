@@ -3,8 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import databaseConfig from '../config/database.config';
-import { VideoChatModule } from './video-chat/video-chat.module';
 import { DatabaseModule } from './database/database.module';
+import { ChatRoomModule } from './chat-room/chat-room.module';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { DatabaseModule } from './database/database.module';
       load: [databaseConfig],
     }),
     DatabaseModule,
-    VideoChatModule,
+    ChatRoomModule,
     DatabaseModule,
   ],
   controllers: [AppController],
