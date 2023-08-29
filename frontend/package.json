@@ -12,7 +12,8 @@
     "peerjs": "^1.4.7",
     "socket.io-client": "^4.7.2",
     "vue": "^3.2.13",
-    "vue-class-component": "^8.0.0-0"
+    "vue-class-component": "^8.0.0-0",
+    "vue-router": "^4.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
