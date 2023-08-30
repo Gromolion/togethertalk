@@ -1,12 +1,20 @@
 import { createApp } from "vue";
-import App from "@/App.vue";
-import ChatRoom from "@/components/ChatRoom/ChatRoom.vue";
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
-const routes = [{ path: "/", component: ChatRoom }];
+import App from "@/App.vue";
+
+import AppRoutes from "@/storage/appRoutes";
+
+import MainPage from "@/pages/MainPage.vue";
+import ChatRoom from "@/pages/ChatRoom.vue";
+
+const routes = [
+  { path: AppRoutes.getMainUrl(), component: MainPage },
+  { path: AppRoutes.getChatRoomUrl(), component: ChatRoom },
+];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 });
 
