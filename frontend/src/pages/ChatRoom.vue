@@ -10,7 +10,10 @@
 
 <script setup>
 import UserVideo from "@/components/ChatRoom/UserVideo.vue";
-import { useInitVideoChat } from "@/components/ChatRoom/hooks";
+import { useInitVideoChat } from "@/components/ChatRoom/hooks.ts";
+import { useRoute } from "vue-router";
 
-const videos = useInitVideoChat();
+const route = useRoute();
+
+const videos = useInitVideoChat(route.query.roomId);
 </script>
