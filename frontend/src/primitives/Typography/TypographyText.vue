@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { TypographyElements } from "@/components/Base/Typography/enum";
+import { TypographyElements } from "@/primitives/Typography/enum";
 
-const props = withDefaults(
-  defineProps<{
-    element: TypographyElements;
-    color: string;
-  }>(),
-  {
-    element: TypographyElements.SPAN,
-    color: "black",
-  }
-);
+type Props = {
+  element: TypographyElements;
+  color: string;
+};
+
+const props = withDefaults(defineProps<Props>, {
+  element: TypographyElements.SPAN,
+  color: "black",
+});
 </script>
 
 <template>
