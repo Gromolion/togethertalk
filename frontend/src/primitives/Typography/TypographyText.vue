@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { TypographyElements } from "@/primitives/Typography/enum";
+import { TypographyElements } from "@/primitives/Typography/enum.ts";
+import Theme from "@/theme/theme.ts";
 
 type Props = {
   element: TypographyElements;
@@ -8,7 +9,7 @@ type Props = {
 
 const props = withDefaults(defineProps<Props>, {
   element: TypographyElements.SPAN,
-  color: "black",
+  color: Theme.textColors.black,
 });
 </script>
 
