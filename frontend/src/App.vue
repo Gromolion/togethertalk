@@ -1,26 +1,30 @@
 <template>
-  <ChatRoom></ChatRoom>
+  <HeaderPanel />
+  <AppView />
 </template>
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import ChatRoom from "@/components/ChatRoom/ChatRoom.vue";
+import HeaderPanel from "@/components/Base/Header/HeaderPanel.vue";
+import AppView from "@/primitives/App/AppView.vue";
 
 @Options({
   components: {
-    ChatRoom,
+    AppView,
+    HeaderPanel,
   },
 })
 export default class App extends Vue {}
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
 }
 </style>
