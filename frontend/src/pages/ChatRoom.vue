@@ -15,5 +15,5 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const videos = useInitVideoChat(route.query.roomId);
+const videos = useInitVideoChat(route.query.roomId.toString());
 </script>

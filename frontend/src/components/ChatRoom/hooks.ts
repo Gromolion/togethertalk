@@ -42,6 +42,7 @@ export function useInitVideoChat(roomId: string) {
         });
 
         socket.on(`user-connected`, (userId: string, socketId: string) => {
+          console.log(`user-connected ${userId} - ${socketId}`)
           const call = peer.call(userId, stream, {
             metadata: {
               socketId: socket.id,

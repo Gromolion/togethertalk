@@ -10,10 +10,10 @@ copy-env:
 	cp backend/.env ../backend/.env
 
 up-and-build:
-	docker-compose up -d --build
+	docker compose up -d --build
 
 up-and-build-force:
-	docker-compose up -d --build --force-recreate
+	docker compose up -d --build --force-recreate
 
 down:
-	docker-compose down
+	docker compose down

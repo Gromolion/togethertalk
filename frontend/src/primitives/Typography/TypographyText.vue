@@ -7,7 +7,7 @@ type Props = {
   color: string;
 };
 
-const props = withDefaults(defineProps<Props>, {
+const props = withDefaults(defineProps<Props>(), {
   element: TypographyElements.SPAN,
   color: Theme.textColors.black,
 });

@@ -11,7 +11,7 @@ export class ChatRoomGateway implements OnGatewayDisconnect {
   private logger: Logger = new Logger('ChatGateway');
 
   @SubscribeMessage('join-room')
-  async handleJoin(client: Socket, userId: string) {
+  async handleConnection(client: Socket, userId: string) {
     const chatRoomUUID: string =
       client.handshake.headers['chat-room-uuid']?.toString();
 

@@ -13,7 +13,6 @@ import { ChatRoomModule } from './chat-room/chat-room.module';
     }),
     DatabaseModule,
     ChatRoomModule,
-    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
