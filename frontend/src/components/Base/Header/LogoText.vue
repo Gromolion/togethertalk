@@ -2,7 +2,7 @@
 import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
 import AppLink from "@/primitives/App/AppLink";
-import AppRoutes from "@/storage/appRoutes.ts";
+import AppRoutes from "@/storage/appState/appRoutes.ts";
 </script>
 
 <template>

@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import App from "@/App.vue";
 
-import AppRoutes from "@/storage/appRoutes";
+import AppRoutes from "@/storage/appState/appRoutes";
 
 import MainPage from "@/pages/MainPage.vue";
 import ChatRoom from "@/pages/ChatRoom.vue";

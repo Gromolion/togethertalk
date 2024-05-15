@@ -2,7 +2,7 @@
 import AppLink from "@/primitives/App/AppLink";
 import TypographyText from "@/primitives/Typography/TypographyText";
 import { TypographyElements } from "@/primitives/Typography/enum";
-import AppRoutes from "@/storage/appRoutes";
+import AppRoutes from "@/storage/appState/appRoutes";
 </script>
 
 <template>
