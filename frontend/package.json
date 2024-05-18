@@ -12,6 +12,7 @@
     "@vue/cli-service": "~5.0.0",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "core-js": "^3.8.3",
     "peerjs": "^1.4.7",
     "socket.io-client": "^4.7.2",
