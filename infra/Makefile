@@ -8,6 +8,7 @@ create-symlinks:
 
 copy-env:
 	cp backend/.env ../backend/.env
+	cp frontend/.env ../frontend/.env
 
 up-and-build:
 	docker compose up -d --build
