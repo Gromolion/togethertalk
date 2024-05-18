@@ -4,13 +4,12 @@ import { TypographyElements } from "@/primitives/Typography/enum";
 import AppLink from "@/primitives/App/AppLink";
 import AppRoutes from "@/storage/appState/appRoutes.ts";
 
-const logoSource = `${window.location.origin}/assets/logo.svg`;
 </script>
 
 <template>
   <div>
     <AppLink :url="AppRoutes.getMainUrl()" id="logoAndText">
-      <img :src="logoSource" alt="logo"/>
+      <img :src="`${window.location.origin}/assets/logo.svg`" alt="logo"/>
       <TypographyText :element="TypographyElements.H2" color="#000206">TogetherTalk</TypographyText>
     </AppLink>
   </div>
