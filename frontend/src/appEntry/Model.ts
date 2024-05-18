@@ -4,6 +4,11 @@ import { memoizeWith } from "ramda";
 export default abstract class Model {
   protected constructor(protected validateFields: string[] = []) {}
 
+  get isValid() {
+    const classValidatorErrors = validateSync(this);
+    return classValidatorErrors.length > 0;
+  }
+
   get errors() {
     const classValidatorErrors = validateSync(this);
 
@@ -28,10 +33,6 @@ export default abstract class Model {
     const modelKeys = this.getValidatableFieldKeys();
     const allKeysWithEmptyValues = Object.fromEntries(modelKeys.map((key) => [key, undefined]));
 
-    console.log({
-      valid,
-      causes: Object.assign({}, allKeysWithEmptyValues, visibleCauses),
-    })
     return {
       valid,
       causes: Object.assign({}, allKeysWithEmptyValues, visibleCauses),
