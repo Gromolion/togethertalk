@@ -8,7 +8,6 @@ const props = withDefaults(defineProps<{
   label?: string;
   type?: string;
   invalid?: boolean;
-  invalidIcon?: boolean;
   autocomplete?: string;
 }>(), {
   type: "text",
