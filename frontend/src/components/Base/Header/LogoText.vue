@@ -11,7 +11,7 @@ const logoSource = `${window.location.origin}/assets/logo.svg`;
   <div>
     <AppLink :url="AppRoutes.getMainUrl()" id="logoAndText">
       <img :src="logoSource" alt="logo"/>
-      <TypographyText :element="TypographyElements.H2" color="white">TogetherTalk</TypographyText>
+      <TypographyText :element="TypographyElements.H2" color="#000206">TogetherTalk</TypographyText>
     </AppLink>
   </div>
 </template>
@@ -23,12 +23,12 @@ div {
 }
 
 img {
-  max-width: 70px;
+  max-width: 80px;
 }
 
 #logoAndText {
   display: flex;
-  gap: 8px;
+  gap: 16px;
   align-items: center;
 }
 </style>
