@@ -1,13 +1,15 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   type: string,
   fill?: string,
   stroke?: string,
 }>();
+
+const src = `${window.location.origin}/assets/icons/${props.type}`;
 </script>
 
 <template>
-  <img alt="" :src="`${window.location.origin}/assets/icons${props.type}`" />
+  <img alt="" :src="src" />
 </template>
 
 <style scoped>
