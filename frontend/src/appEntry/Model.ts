@@ -6,7 +6,7 @@ export default abstract class Model {
 
   get isValid() {
     const classValidatorErrors = validateSync(this);
-    return classValidatorErrors.length > 0;
+    return classValidatorErrors.length === 0;
   }
 
   get errors() {
