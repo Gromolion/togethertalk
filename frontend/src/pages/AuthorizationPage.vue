@@ -12,6 +12,7 @@ const togglePasswordIconHovered = ref(false);
 
 const model = new AuthModel();
 const store = useStore();
+const router = useRouter();
 
 const handleSubmit = async () => {
   if (!model.isValid) return;
@@ -19,8 +20,8 @@ const handleSubmit = async () => {
   try {
     await store.dispatch("auth/login", model);
 
-    if (store.state.auth.result) {
-      useRouter().push({ path: AppRoutes.getMainUrl() });
+    if (store.state.auth.token) {
+      await router.push({ path: AppRoutes.getMainUrl() });
     }
   } catch (e) {
     store.dispatch("toast/new", {
@@ -37,23 +38,51 @@ const handleSubmit = async () => {
     <h5 id="authHeader" class="display-6">Авторизация</h5>
     <form>
       <div class="form-floating mb-4">
-        <InputField id="loginInput" v-model="model.login" class-name="form-control" placeholder="Логин"
-                    label="Логин" :invalid="!!model.errors.causes.login" autocomplete="username"/>
+        <InputField
+          id="loginInput"
+          v-model="model.login"
+          class-name="form-control"
+          placeholder="Логин"
+          label="Логин"
+          :invalid="!!model.errors.causes.login"
+          autocomplete="username"
+        />
       </div>
       <div class="form-floating mb-4 d-flex">
-        <InputField id="passwordInput" v-model="model.password" class-name="form-control" placeholder="Пароль"
-                    label="Пароль" :invalid="!!model.errors.causes.password" autocomplete="password" :type="togglePassword ? 'text' : 'password'"/>
-        <i class="bi h4"
-           :class="[togglePassword ? 'bi-eye' : 'bi-eye-slash', {'opacity-75': !togglePasswordIconHovered }]"
-           id="togglePassword"
-           @click="togglePassword = !togglePassword"
-           @mouseover="togglePasswordIconHovered = true"
-           @mouseout="togglePasswordIconHovered = false"
+        <InputField
+          id="passwordInput"
+          v-model="model.password"
+          class-name="form-control"
+          placeholder="Пароль"
+          label="Пароль"
+          :invalid="!!model.errors.causes.password"
+          autocomplete="password"
+          :type="togglePassword ? 'text' : 'password'"
+        />
+        <i
+          class="bi h4"
+          :class="[
+            togglePassword ? 'bi-eye' : 'bi-eye-slash',
+            { 'opacity-75': !togglePasswordIconHovered },
+          ]"
+          id="togglePassword"
+          @click="togglePassword = !togglePassword"
+          @mouseover="togglePasswordIconHovered = true"
+          @mouseout="togglePasswordIconHovered = false"
         />
       </div>
       <div class="container d-flex gap-4 justify-content-center">
-        <button type="button" class="btn btn-outline-secondary px-5 py-2" @click="handleSubmit" :disabled="store.state.auth.isLoading">Войти</button>
-        <button type="button" class="btn btn-link px-3 py-2">Забыли пароль?</button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary px-5 py-2"
+          @click="handleSubmit"
+          :disabled="store.state.auth.isLoading"
+        >
+          Войти
+        </button>
+        <button type="button" class="btn btn-link px-3 py-2">
+          Забыли пароль?
+        </button>
       </div>
     </form>
   </div>

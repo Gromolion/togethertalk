@@ -1,4 +1,6 @@
 import Decoder from "jsonous";
+import { err, ok } from "resulty";
+import { isNil } from "ramda";
 
 export function orNull<T>(decoder: Decoder<T>, defaultValue: T | null = null) {
   return new Decoder<T | null>((value) => {
@@ -12,7 +14,7 @@ export function orNull<T>(decoder: Decoder<T>, defaultValue: T | null = null) {
 export const fieldWithDefaultDecoder = <A>(
   key: string,
   decoder: Decoder<A>,
-  defaultValue: A | null = null,
+  defaultValue: A | null = null
 ) =>
   new Decoder<A | null>((value: Record<string, any>) => {
     if (isNil(value) || isNil(value[key])) {

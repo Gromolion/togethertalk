@@ -5,11 +5,13 @@ import Theme from "@/theme/theme.ts";
 type Props = {
   element: TypographyElements;
   color: string;
+  hoverColor?: string;
 };
 
 const props = withDefaults(defineProps<Props>(), {
   element: TypographyElements.SPAN,
-  color: Theme.textColors.black,
+  color: Theme.textColors.link,
+  hoverColor: Theme.textColors.linkHover,
 });
 </script>
 
@@ -26,5 +28,9 @@ const props = withDefaults(defineProps<Props>(), {
   font-family: "Montserrat", serif;
   margin: 0;
   color: v-bind(color);
+}
+
+#typography:hover {
+  color: v-bind(hoverColor);
 }
 </style>

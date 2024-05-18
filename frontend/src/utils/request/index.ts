@@ -1,6 +1,7 @@
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig, CancelToken } from "axios";
 import { AppRequestError } from "@/utils/request/AppRequestError";
 import Decoder from "jsonous";
+import { ID } from "@/services/api/types";
 
 export type CreateRequest<DecoderGenericType> = {
   url: string;
@@ -13,6 +14,20 @@ export type CreateRequest<DecoderGenericType> = {
   };
 };
 
+export interface RequestOptions {
+  disableBeforeErrorMiddlewares?: boolean;
+  progressReceiver?: (progress: number) => void;
+  cancelToken?: CancelToken;
+}
+
+export interface RequestData {
+  body?: any;
+  additionalQueryParams?: Record<string, string | number | ID[]>;
+  options?: RequestOptions;
+  urlParams?: Record<string, string | number>;
+  headers?: Record<string, string>;
+}
+
 export enum METHODS {
   POST = "post",
   GET = "get",
@@ -24,12 +39,12 @@ export enum METHODS {
 function template(text: string, keyMap: Record<string, string | number>) {
   return Object.keys(keyMap).reduce(
     (prev, mapKey) => prev.replace(`{${mapKey}}`, keyMap[mapKey].toString()),
-    text,
+    text
   );
 }
 
 export class RequestManager {
-  public static baseUrl;
+  public static baseUrl: string;
 
   static beforeRequestMiddleware: ((data: {
     config: AxiosRequestConfig;
@@ -42,12 +57,14 @@ export class RequestManager {
   }) => AppRequestError | Promise<AppRequestError | null> | null)[] = [];
 
   static createRequest<DecoderValue>({
-                                url,
-                                method = METHODS.GET,
-                                requestConfig = {},
-                                serverDataDecoder,
-                              }: CreateRequest<DecoderValue>) {
-    return async function (requestData: RequestData = {}): Promise<DecoderValue> {
+    url,
+    method = METHODS.GET,
+    requestConfig = {},
+    serverDataDecoder,
+  }: CreateRequest<DecoderValue>) {
+    return async function (
+      requestData: RequestData = {}
+    ): Promise<DecoderValue> {
       const [requestResult, requestError] = await RequestManager.makeRequest({
         url,
         method,
@@ -59,7 +76,7 @@ export class RequestManager {
         throw await RequestManager.applyError(
           AppRequestError.buildFromAxiosError(requestError.axiosError),
           requestError.requestData,
-          requestData,
+          requestData
         );
 
       if (!requestResult || !serverDataDecoder) return null!;
@@ -73,31 +90,40 @@ export class RequestManager {
 
       if (!decoderError) return data;
       throw await RequestManager.applyError(
-        new AppRequestError({message: `Response parsing error: ${decoderError}`, errors: {}}, -1),
+        new AppRequestError(
+          { message: `Response parsing error: ${decoderError}`, errors: {} },
+          -1
+        ),
         requestResult.requestData,
-        requestData,
+        requestData
       );
     };
   }
 
   private static async makeRequest({
-                                     url,
-                                     method,
-                                     requestConfig,
-                                     requestData: {options = {}, urlParams, additionalQueryParams, body, headers},
-                                   }: Required<Pick<CreateRequest<any>, "url" | "method" | "requestConfig">> & {
+    url,
+    method,
+    requestConfig,
+    requestData: {
+      options = {},
+      urlParams,
+      additionalQueryParams,
+      body,
+      headers,
+    },
+  }: Required<Pick<CreateRequest<any>, "url" | "method" | "requestConfig">> & {
     requestData: RequestData;
   }) {
     const requestData: AxiosRequestConfig = {
       url,
       method,
-      baseURL: RequestManager.baseURL,
-      headers: {accept: "application/json", ...headers},
+      baseURL: RequestManager.baseUrl,
+      headers: { accept: "application/json", ...headers },
       withCredentials: true,
     };
 
     if (requestConfig.contentType) {
-      requestData.headers["content-type"] = requestConfig.contentType;
+      requestData.headers!["content-type"] = requestConfig.contentType;
     }
     if (requestConfig.responseType) {
       requestData.responseType = requestConfig.responseType;
@@ -114,8 +140,8 @@ export class RequestManager {
     }
 
     if (options.progressReceiver) {
-      requestData.onUploadProgress = function ({loaded, total}) {
-        options.progressReceiver!((loaded / total) * 100);
+      requestData.onUploadProgress = function ({ loaded, total }) {
+        options.progressReceiver!((loaded / total!) * 100);
       };
     }
 
@@ -125,12 +151,15 @@ export class RequestManager {
 
     try {
       await RequestManager.applyAllBeforeRequestMiddleware(requestData);
-      const {data} = await axios(requestData);
-      return [{requestData, response: data}, null] as const;
+      const { data } = await axios(requestData);
+      return [{ requestData, response: data }, null] as const;
     } catch (axiosError) {
       return [
         null,
-        {requestData, axiosError} as { requestData: AxiosRequestConfig; axiosError: AxiosError },
+        { requestData, axiosError } as {
+          requestData: AxiosRequestConfig;
+          axiosError: AxiosError;
+        },
       ] as const;
     }
   }
@@ -138,13 +167,18 @@ export class RequestManager {
   private static async applyError(
     error: AppRequestError,
     axiosRequestConfig: AxiosRequestConfig,
-    requestData: RequestData = {},
+    requestData: RequestData = {}
   ) {
     if (requestData.options?.disableBeforeErrorMiddlewares) return error;
-    return await RequestManager.applyAllBeforeErrorMiddleware(error, axiosRequestConfig);
+    return await RequestManager.applyAllBeforeErrorMiddleware(
+      error,
+      axiosRequestConfig
+    );
   }
 
-  private static async applyAllBeforeRequestMiddleware(config: AxiosRequestConfig) {
+  private static async applyAllBeforeRequestMiddleware(
+    config: AxiosRequestConfig
+  ) {
     for (let i = 0; i < RequestManager.beforeRequestMiddleware.length; i++) {
       const middleware = RequestManager.beforeRequestMiddleware[i];
       await middleware({ config });
@@ -153,7 +187,7 @@ export class RequestManager {
 
   private static async applyAllBeforeErrorMiddleware(
     error: AppRequestError,
-    config: AxiosRequestConfig,
+    config: AxiosRequestConfig
   ) {
     const shareData: Record<string, any> = {};
     for (let i = 0; i < RequestManager.beforeErrorMiddleware.length; i++) {

@@ -14,19 +14,18 @@ export const auth = {
     login({ commit }, authModel: AuthModel) {
       this.state.auth.isLoading = true;
       return AuthGateway.login(authModel).then(
-        user => {
-          commit('loginSuccess', user);
+        (user) => {
+          commit("loginSuccess", user);
           return Promise.resolve(user);
         },
-        error => {
-          commit('loginFailure', error);
+        (error) => {
+          commit("loginFailure", error);
           return Promise.reject(error);
         }
       );
     },
     logout({ commit }) {
-      AuthService.logout();
-      commit('logout');
+      commit("logout");
     },
   },
   mutations: {
@@ -36,12 +35,14 @@ export const auth = {
       state.isLoading = false;
     },
     loginFailure(state) {
-      state.result = null;
+      state.token = null;
+      state.userId = null;
       state.isLoading = false;
     },
     logout(state) {
-      state.result = null;
+      state.token = null;
+      state.userId = null;
       state.isLoading = false;
     },
-  }
+  },
 };

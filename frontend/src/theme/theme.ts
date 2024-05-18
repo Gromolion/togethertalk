@@ -4,6 +4,7 @@ export default class Theme {
   };
 
   static textColors = {
-    black: "rgb(0, 0, 0)",
+    link: "#5b5b5b",
+    linkHover: "#000206",
   };
 }

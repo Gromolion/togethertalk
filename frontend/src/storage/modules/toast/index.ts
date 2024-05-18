@@ -13,21 +13,23 @@ export const toast = {
     toasts: [],
   },
   actions: {
-    new({commit}, toast: ToastInterface) {
+    new({ commit }, toast: ToastInterface) {
       commit("append", toast);
       setTimeout(() => commit("remove", toast.uid), 5000);
     },
-    remove({commit}, uid: string) {
+    remove({ commit }, uid: string) {
       commit("remove", uid);
-    }
+    },
   },
   mutations: {
-    append(state, toastToAppend: ToastInterface) {
-      toastToAppend.uid = Math.random().toString(16).slice(2);
-      state.toasts.push(toastToAppend);
+    append(state, toast: ToastInterface) {
+      toast.uid = Math.random().toString(16).slice(2);
+      state.toasts.push(toast);
     },
     remove(state, uid: string) {
-      state.toasts = state.toasts.filter((currentToast) => currentToast.uid !== uid);
-    }
+      state.toasts = state.toasts.filter(
+        (toast: ToastInterface) => toast.uid !== uid
+      );
+    },
   },
-}
+};

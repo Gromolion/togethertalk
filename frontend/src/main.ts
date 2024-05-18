@@ -9,15 +9,19 @@ import MainPage from "@/pages/MainPage.vue";
 import ChatRoom from "@/pages/ChatRoomPage.vue";
 import AuthorizationPage from "@/pages/AuthorizationPage.vue";
 
-import "bootstrap/dist/css/bootstrap.min.css"
-import 'bootstrap-icons/font/bootstrap-icons.css'
-import "bootstrap"
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "bootstrap";
 import { RequestManager } from "@/utils/request";
 import { store } from "@/storage";
 
 const routes = [
   { path: AppRoutes.getMainUrl(), component: MainPage },
-  { path: AppRoutes.getAuthorizationUrl(), component: AuthorizationPage, meta: { availableWithoutAuth: true } },
+  {
+    path: AppRoutes.getAuthorizationUrl(),
+    component: AuthorizationPage,
+    meta: { availableWithoutAuth: true },
+  },
   { path: AppRoutes.getChatRoomUrl(), component: ChatRoom },
 ];
 
@@ -41,6 +45,6 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-RequestManager.baseUrl = process.env.API_URL;
+RequestManager.baseUrl = process.env.VUE_APP_API_URL;
 
 app.mount("#app");

@@ -2,6 +2,7 @@ import { AppRequestErrors } from "@/enums/errors";
 import { AppError, AppErrorValue } from "@/utils/request/AppError";
 import axios, { AxiosError } from "axios";
 import { isObject } from "class-validator";
+import { ApiResponse } from "@/services/api/decoders";
 
 export class AppRequestError extends AppError {
   public readonly type: AppRequestErrors = AppRequestErrors.REQUEST_ERROR;
@@ -11,7 +12,9 @@ export class AppRequestError extends AppError {
   }
 
   static isCancelError(data: any) {
-    return AppRequestError.isRequestError(data) && axios.isCancel(data.axiosError);
+    return (
+      AppRequestError.isRequestError(data) && axios.isCancel(data.axiosError)
+    );
   }
 
   static unwrap(error: AppRequestError) {
@@ -22,14 +25,14 @@ export class AppRequestError extends AppError {
     return new AppRequestError(
       { message: error.message, errors: {} },
       error.response?.status || -1,
-      error,
+      error
     );
   }
 
   constructor(
     private _error: { message: string; errors: Record<string, AppErrorValue> },
     public statusCode: number,
-    public axiosError?: AxiosError,
+    public axiosError?: AxiosError
   ) {
     super();
     this.setMessage(_error.message);
