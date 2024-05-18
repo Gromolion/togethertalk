@@ -8,12 +8,12 @@ import AppRoutes from "@/storage/appState/appRoutes";
 <template>
   <div id="header-links-container">
     <AppLink class="header-link" :url="AppRoutes.getMainUrl()">
-      <TypographyText :element="TypographyElements.H4" color="white"
+      <TypographyText :element="TypographyElements.H4" color="#000206"
         >Главная</TypographyText
       >
     </AppLink>
     <AppLink class="header-link" :url="AppRoutes.getChatRoomUrl()">
-      <TypographyText :element="TypographyElements.H4" color="white"
+      <TypographyText :element="TypographyElements.H4" color="#000206"
         >Создать чат</TypographyText
       >
     </AppLink>
