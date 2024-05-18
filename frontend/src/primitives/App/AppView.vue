@@ -5,9 +5,3 @@
     <router-view />
   </div>
 </template>
-
-<style scoped>
-.container {
-  background: #624977;
-}
-</style>
