@@ -5,12 +5,17 @@ import { Video } from "@/components/ChatRoom/types";
 import { MediaConnection } from "peerjs";
 // noinspection ES6UnusedImports
 import adapter from "webrtc-adapter";
+import { useStore } from "vuex";
 
 export function useInitVideoChat(roomId: string) {
   const videos: Ref<Video[]> = ref([]);
+
+  const store = useStore();
+
   const socket = useSocket("chat-room", {
     extraHeaders: {
       "Chat-Room-UUID": roomId,
+      authorization: `Bearer ${store.state.auth.token}`,
     },
   });
   navigator.mediaDevices
@@ -25,7 +30,7 @@ export function useInitVideoChat(roomId: string) {
           stream: stream,
         });
 
-        const peer = usePeer(socket.id, "/peerjs");
+        const peer = usePeer(socket.id, store.state.auth.token, "/peerjs");
 
         peer.on(`open`, (id: string) => {
           socket.emit(`join-room`, id);
@@ -42,7 +47,7 @@ export function useInitVideoChat(roomId: string) {
         });
 
         socket.on(`user-connected`, (userId: string, socketId: string) => {
-          console.log(`user-connected ${userId} - ${socketId}`)
+          console.log(`user-connected ${userId} - ${socketId}`);
           const call = peer.call(userId, stream, {
             metadata: {
               socketId: socket.id,

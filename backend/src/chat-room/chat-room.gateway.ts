@@ -4,12 +4,14 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
+import { AuthGuard } from './guards/auth.guard';
 
 @WebSocketGateway({ cors: '*:*', namespace: 'chat-room' })
 export class ChatRoomGateway implements OnGatewayDisconnect {
   private logger: Logger = new Logger('ChatGateway');
 
+  @UseGuards(AuthGuard)
   @SubscribeMessage('join-room')
   async handleConnection(client: Socket, userId: string) {
     const chatRoomUUID: string =

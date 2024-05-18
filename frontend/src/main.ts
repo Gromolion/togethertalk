@@ -14,6 +14,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap";
 import { RequestManager } from "@/utils/request";
 import { store } from "@/storage";
+import { initMiddlewares } from "@/services/api/middlewares";
 
 const routes = [
   { path: AppRoutes.getMainUrl(), component: MainPage },
@@ -44,6 +45,8 @@ router.beforeEach((to, from, next) => {
     next(AppRoutes.getAuthorizationUrl());
   }
 });
+
+initMiddlewares();
 
 RequestManager.baseUrl = process.env.VUE_APP_API_URL;
 

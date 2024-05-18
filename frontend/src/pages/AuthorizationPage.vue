@@ -90,7 +90,6 @@ const handleSubmit = async () => {
 
 <style scoped>
 #authContainer {
-  background-color: #fff;
   margin-top: 150px;
   max-width: 600px;
   border: 1px solid #a9a9a9;
