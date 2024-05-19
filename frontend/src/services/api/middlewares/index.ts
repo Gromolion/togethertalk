@@ -1,11 +1,10 @@
 import { RequestManager } from "@/utils/request";
-import { useStore } from "vuex";
+import { Store } from "vuex";
 
-export const initMiddlewares = () => {
+export const initMiddlewares = (store: Store) => {
   RequestManager.beforeRequestMiddleware.push(({ config }) => {
     if (!config.headers) config.headers = {};
 
-    const store = useStore();
     const token = store.state.auth.token;
 
     if (token) {

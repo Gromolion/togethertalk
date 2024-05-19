@@ -1,25 +1,30 @@
 import { validateSync, ValidationError } from "class-validator";
 import { memoizeWith } from "ramda";
 import { Exclude } from "class-transformer";
+import { reactive } from "vue";
 
 export default abstract class Model {
   @Exclude()
   protected validateFields: string[] = [];
 
+  @Exclude()
+  public validationResult = reactive({
+    valid: true,
+    causes: {},
+  });
+
   protected constructor() {}
 
   get isValid() {
     const classValidatorErrors = validateSync(this);
-    return classValidatorErrors.length === 0;
-  }
 
-  get errors() {
-    const classValidatorErrors = validateSync(this);
+    if (classValidatorErrors.length !== 0) {
+      this.validationResult = this.getResultByErrors(classValidatorErrors);
+      return this.validationResult.valid;
+    }
 
-    if (classValidatorErrors.length !== 0)
-      return this.getResultByErrors(classValidatorErrors);
-
-    return this.getValidResult(true);
+    this.validationResult = this.getValidResult(true);
+    return this.validationResult.valid;
   }
 
   private getResultByErrors(classValidatorErrors: ValidationError[]) {

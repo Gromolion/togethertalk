@@ -46,7 +46,7 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-initMiddlewares();
+initMiddlewares(store);
 
 RequestManager.baseUrl = process.env.VUE_APP_API_URL;
 

@@ -7,12 +7,10 @@ export const auth = {
   state: {
     token: null,
     userId: null,
-    isLoading: false,
     token: null,
   },
   actions: {
     login({ commit }, authModel: AuthModel) {
-      this.state.auth.isLoading = true;
       return AuthGateway.login(authModel).then(
         (user) => {
           commit("loginSuccess", user);
@@ -32,17 +30,14 @@ export const auth = {
     loginSuccess(state, loginResult) {
       state.token = loginResult.token;
       state.userId = loginResult.userId;
-      state.isLoading = false;
     },
     loginFailure(state) {
       state.token = null;
       state.userId = null;
-      state.isLoading = false;
     },
     logout(state) {
       state.token = null;
       state.userId = null;
-      state.isLoading = false;
     },
   },
 };

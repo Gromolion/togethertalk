@@ -14,16 +14,24 @@ const model = new AuthModel();
 const store = useStore();
 const router = useRouter();
 
+const loading = ref(false);
+
 const handleSubmit = async () => {
   if (!model.isValid) return;
 
+  loading.value = true;
+
   try {
     await store.dispatch("auth/login", model);
+
+    loading.value = false;
 
     if (store.state.auth.token) {
       await router.push({ path: AppRoutes.getMainUrl() });
     }
   } catch (e) {
+    loading.value = false;
+
     store.dispatch("toast/new", {
       title: "Произошла ошибка",
       message: e.message,
@@ -36,7 +44,7 @@ const handleSubmit = async () => {
 <template>
   <div class="container pt-5 px-5 pb-4" id="authContainer">
     <h5 id="authHeader" class="display-6">Авторизация</h5>
-    <form>
+    <form @submit.prevent="handleSubmit">
       <div class="form-floating mb-4">
         <InputField
           id="loginInput"
@@ -44,7 +52,7 @@ const handleSubmit = async () => {
           class-name="form-control"
           placeholder="Логин"
           label="Логин"
-          :invalid="!!model.errors.causes.login"
+          :invalid="!!model.validationResult.causes.login"
           autocomplete="username"
         />
       </div>
@@ -55,8 +63,8 @@ const handleSubmit = async () => {
           class-name="form-control"
           placeholder="Пароль"
           label="Пароль"
-          :invalid="!!model.errors.causes.password"
-          autocomplete="password"
+          :invalid="!!model.validationResult.causes.password"
+          autocomplete="current-password"
           :type="togglePassword ? 'text' : 'password'"
         />
         <i
@@ -73,10 +81,9 @@ const handleSubmit = async () => {
       </div>
       <div class="container d-flex gap-4 justify-content-center">
         <button
-          type="button"
+          type="submit"
           class="btn btn-outline-secondary px-5 py-2"
-          @click="handleSubmit"
-          :disabled="store.state.auth.isLoading"
+          :disabled="loading"
         >
           Войти
         </button>

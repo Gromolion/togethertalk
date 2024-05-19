@@ -9,5 +9,9 @@ export const store = createStore({
     auth,
     toast,
   },
-  plugins: [createPersistedState()]
+  plugins: [
+    createPersistedState({
+      paths: ["auth"],
+    }),
+  ],
 });

@@ -4,7 +4,7 @@ import Theme from "@/theme/theme.ts";
 
 type Props = {
   element: TypographyElements;
-  color: string;
+  color?: string;
   hoverColor?: string;
 };
 
