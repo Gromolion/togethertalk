@@ -21,7 +21,7 @@ const routes = [
   {
     path: AppRoutes.getAuthorizationUrl(),
     component: AuthorizationPage,
-    meta: { availableWithoutAuth: true },
+    meta: { availableWithoutAuth: true, onlyWithoutAuth: true },
   },
   { path: AppRoutes.getChatRoomUrl(), component: ChatRoom },
 ];
@@ -44,6 +44,15 @@ router.beforeEach((to, from, next) => {
   } else {
     next(AppRoutes.getAuthorizationUrl());
   }
+});
+router.beforeEach((to, from, next) => {
+  if (
+    store.state.auth.token &&
+    to.matched.some((route) => route.meta.onlyWithoutAuth)
+  )
+    next(AppRoutes.getMainUrl());
+
+  next();
 });
 
 initMiddlewares(store);

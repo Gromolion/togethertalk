@@ -26,6 +26,7 @@ const handleLogout = async () => {
       >
     </AppLink>
     <TypographyText
+      v-if="store.state.auth.token"
       :element="TypographyElements.H5"
       style="cursor: pointer"
       @click="handleLogout()"
