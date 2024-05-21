@@ -12,6 +12,7 @@ async function bootstrap() {
 
   const server = app.getHttpServer();
   const peerServer = ExpressPeerServer(server);
+
   app.use('/peerjs', peerServer);
 
   await app.listen(3000);

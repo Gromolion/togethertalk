@@ -2,14 +2,24 @@
 import UserVideo from "@/components/ChatRoom/UserVideo.vue";
 import { useInitVideoChat } from "@/components/ChatRoom/hooks.ts";
 import { useRoute } from "vue-router";
-import { computed, reactive } from "vue";
+import { computed } from "vue";
 import ConferenceActions from "@/components/ChatRoom/ConferenceActions.vue";
 import ChatActions from "@/entities/chat/chatActions";
+import { useStore } from "vuex";
+import TypographyText from "@/primitives/Typography/TypographyText.vue";
+import { TypographyElements } from "@/primitives/Typography/enum";
+import ChatMember from "@/components/ChatRoom/ChatMember.vue";
 
 const route = useRoute();
+const store = useStore();
+const actions = new ChatActions();
 
-const videos = useInitVideoChat(route.query.roomId?.toString());
-const videosLength = computed(() => Object.keys(videos.value).length);
+const videoChat = computed(() => {
+  return useInitVideoChat(route.query.roomId?.toString(), actions, store);
+});
+const videosLength = computed(
+  () => Object.keys(videoChat.value.videos.value).length
+);
 
 const videoRowsRule = {
   1: "video-row-1",
@@ -19,7 +29,6 @@ const videoRowsRule = {
 
 const inRow = computed(() =>
   Object.entries(videoRowsRule).reduce((acc, [key]) => {
-    console.log(videosLength.value);
     if (videosLength.value >= key) acc = key;
     return acc;
   }, 0)
@@ -28,18 +37,31 @@ const inRow = computed(() =>
 const groupedVideos = computed(() => {
   const acc = [];
   for (let i = 0; i < videosLength.value; i += inRow.value) {
-    acc.push(videos.value.slice(i, i + inRow.value));
+    acc.push(videoChat.value.videos.value.slice(i, i + inRow.value));
   }
   return acc;
 });
 
-const actions = new ChatActions();
+const disconnect = () => {
+  videoChat.value.socket.disconnect();
+};
 </script>
 
 <template>
-  <div class="container">
+  <div
+    class="container"
+    :class="{
+      decreased:
+        videoChat.videos.value.length < 2 &&
+        !actions.showChat &&
+        !actions.showUsers,
+    }"
+  >
     <div class="chatRoom d-flex">
-      <div ref="videoGrid" class="video-grid p-4">
+      <div
+        class="videoGrid p-4"
+        :class="{ fullWidth: !actions.showChat && !actions.showUsers }"
+      >
         <div
           class="videoRow d-flex flex-wrap justify-content-between"
           v-for="(videoRow, rowIndex) in groupedVideos"
@@ -54,24 +76,36 @@ const actions = new ChatActions();
           />
         </div>
       </div>
-      <div class="sideBlock">
+      <div
+        class="sideBlock"
+        :class="{ collapsed: !actions.showChat && !actions.showUsers }"
+      >
         <div
-          class="chat-container sideBlockContainer"
+          class="chat-container sideBlockContainer p-4"
           :class="{
             collapsed: !actions.showChat,
-            halfHeight: actions.showChat && actions.showUsers,
           }"
-        ></div>
+        >
+          <TypographyText :element="TypographyElements.H4">Чат</TypographyText>
+        </div>
         <div
-          class="users-container sideBlockContainer"
+          class="users-container sideBlockContainer p-4"
           :class="{
             collapsed: !actions.showUsers,
-            halfHeight: actions.showChat && actions.showUsers,
           }"
-        ></div>
+        >
+          <TypographyText :element="TypographyElements.H4"
+            >Участники</TypographyText
+          >
+          <ChatMember
+            :video="video"
+            v-for="video in videoChat.videos.value"
+            :key="video.socketId"
+          />
+        </div>
       </div>
     </div>
-    <ConferenceActions v-model="actions" />
+    <ConferenceActions v-model="actions" @leave="disconnect" />
   </div>
 </template>
 
@@ -87,6 +121,18 @@ const actions = new ChatActions();
   box-shadow: 14px 14px 20px 0 rgba(0, 0, 0, 0.1);
 }
 
+.container.decreased {
+  max-width: 1000px;
+}
+
+.videoGrid {
+  width: 70%;
+}
+
+.videoGrid.fullWidth {
+  width: 100% !important;
+}
+
 .sideBlock {
   width: 30%;
   border-left: 1px solid #a9a9a9;
@@ -96,11 +142,8 @@ const actions = new ChatActions();
   height: 100%;
 }
 
-.sideBlock .halfHeight {
-  height: 50% !important;
-}
-
-.chat-container {
+.collapsed {
+  display: none;
 }
 
 .video {

@@ -11,7 +11,6 @@ type Props = {
 const props = withDefaults(defineProps<Props>(), {
   element: TypographyElements.SPAN,
   color: Theme.textColors.link,
-  hoverColor: Theme.textColors.linkHover,
 });
 </script>
 
@@ -31,6 +30,6 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 #typography:hover {
-  color: v-bind(hoverColor);
+  color: v-bind("hoverColor || color");
 }
 </style>

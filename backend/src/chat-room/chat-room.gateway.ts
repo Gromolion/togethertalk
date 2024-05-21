@@ -6,6 +6,8 @@ import {
 import { Socket } from 'socket.io';
 import { Logger, UseGuards } from '@nestjs/common';
 import { AuthGuard } from './guards/auth.guard';
+import { User } from '../entities/user.entity';
+import SocketWithUser from './socketWithUser';
 
 @WebSocketGateway({ cors: '*:*', namespace: 'chat-room' })
 export class ChatRoomGateway implements OnGatewayDisconnect {
@@ -13,13 +15,19 @@ export class ChatRoomGateway implements OnGatewayDisconnect {
 
   @UseGuards(AuthGuard)
   @SubscribeMessage('join-room')
-  async handleConnection(client: Socket, userId: string) {
-    const chatRoomUUID: string =
-      client.handshake.headers['chat-room-uuid']?.toString();
+  async handleConnection(
+    client: SocketWithUser & { user: User },
+    peerId: string,
+  ) {
+    const chatRoomUUID: string = client.handshake.headers[
+      'chat-room-uuid'
+    ] as string;
 
     client.join(`room_${chatRoomUUID}`);
 
-    client.to(`room_${chatRoomUUID}`).emit(`user-connected`, userId, client.id);
+    client
+      .to(`room_${chatRoomUUID}`)
+      .emit(`user-connected`, client.user, peerId);
 
     this.logger.log(`Client ${client.id} connected to ${chatRoomUUID}`);
   }
@@ -33,5 +41,35 @@ export class ChatRoomGateway implements OnGatewayDisconnect {
     client.to(`room_${chatRoomUUID}`).emit(`user-disconnected`, client.id);
 
     this.logger.log(`Client disconnected: ${client.id}`);
+  }
+
+  @UseGuards(AuthGuard)
+  @SubscribeMessage('videoTrackChange')
+  async handleVideoTrackChange(
+    client: Socket,
+    body: {
+      socketId: string;
+      enabled: boolean;
+    },
+  ) {
+    const chatRoomUUID: string =
+      client.handshake.headers['chat-room-uuid']?.toString();
+
+    client.to(`room_${chatRoomUUID}`).emit(`videoTrackChanged`, body);
+  }
+
+  @UseGuards(AuthGuard)
+  @SubscribeMessage('audioTrackChange')
+  async handleAudioTrackChange(
+    client: Socket,
+    body: {
+      socketId: string;
+      enabled: boolean;
+    },
+  ) {
+    const chatRoomUUID: string =
+      client.handshake.headers['chat-room-uuid']?.toString();
+
+    client.to(`room_${chatRoomUUID}`).emit(`audioTrackChanged`, body);
   }
 }

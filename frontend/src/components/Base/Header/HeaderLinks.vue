@@ -5,6 +5,7 @@ import { TypographyElements } from "@/primitives/Typography/enum";
 import AppRoutes from "@/storage/appState/appRoutes";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import Theme from "@/theme/theme";
 
 const store = useStore();
 const router = useRouter();
@@ -18,16 +19,23 @@ const handleLogout = async () => {
 <template>
   <div id="header-links-container">
     <AppLink class="header-link" :url="AppRoutes.getMainUrl()">
-      <TypographyText :element="TypographyElements.H5">Главная</TypographyText>
+      <TypographyText
+        :element="TypographyElements.H5"
+        :hoverColor="Theme.textColors.linkHover"
+        >Главная</TypographyText
+      >
     </AppLink>
     <AppLink class="header-link" :url="AppRoutes.getChatRoomUrl()">
-      <TypographyText :element="TypographyElements.H5"
+      <TypographyText
+        :element="TypographyElements.H5"
+        :hoverColor="Theme.textColors.linkHover"
         >Создать чат</TypographyText
       >
     </AppLink>
     <TypographyText
       v-if="store.state.auth.token"
       :element="TypographyElements.H5"
+      :hoverColor="Theme.textColors.linkHover"
       style="cursor: pointer"
       @click="handleLogout()"
       >Выйти</TypographyText

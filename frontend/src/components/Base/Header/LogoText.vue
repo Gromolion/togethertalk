@@ -3,6 +3,7 @@ import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
 import AppLink from "@/primitives/App/AppLink";
 import AppRoutes from "@/storage/appState/appRoutes.ts";
+import Theme from "@/theme/theme";
 
 const src = `${window.location.origin}/assets/logo.svg`;
 </script>
@@ -10,8 +11,12 @@ const src = `${window.location.origin}/assets/logo.svg`;
 <template>
   <div>
     <AppLink :url="AppRoutes.getMainUrl()" id="logoAndText">
-      <img :src="src" alt="logo"/>
-      <TypographyText :element="TypographyElements.H2" color="#000206">TogetherTalk</TypographyText>
+      <img :src="src" alt="logo" />
+      <TypographyText
+        :element="TypographyElements.H2"
+        :hoverColor="Theme.textColors.linkHover"
+        >TogetherTalk</TypographyText
+      >
     </AppLink>
   </div>
 </template>

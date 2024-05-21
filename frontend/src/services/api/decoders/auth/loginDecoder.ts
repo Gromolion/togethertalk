@@ -3,10 +3,13 @@ import { ExtractDecoderType } from "@/services/api/decoders/types";
 import LoginResult from "@/entities/auth/loginResult";
 import { orNull } from "@/services/api/decoders/commonDecoders";
 import { toObject } from "@/services/api/decoders";
+import { userDecoder } from "@/services/api/decoders/user/userDecoder";
 
 export const loginDecoder = succeed({})
   .assign("token", orNull(field("token", string)))
-  .assign("userId", orNull(field("userId", number)))
+  .assign("user", orNull(field("user", userDecoder)))
   .andThen(toObject(LoginResult));
 
-export type LoginResultInterface = ExtractDecoderType<typeof loginDecoder.decodeAny>;
+export type LoginResultInterface = ExtractDecoderType<
+  typeof loginDecoder.decodeAny
+>;

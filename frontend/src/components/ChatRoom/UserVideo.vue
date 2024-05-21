@@ -1,46 +1,50 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { Video } from "@/components/ChatRoom/types";
+import TypographyText from "@/primitives/Typography/TypographyText.vue";
+import { TypographyElements } from "@/primitives/Typography/enum";
 
-interface Props {
+const props = defineProps<{
   video: Video;
-  width?: number;
-  height?: number;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  // width: 320,
-  // height: 180,
-});
-
-// const width = ref(props.width);
-// const height = ref(props.height);
+}>();
 
 function playVideo(event: Event) {
   const eventTarget = event.target as HTMLVideoElement;
   eventTarget.play();
 }
-
-function canPlay(event: Event) {
-  const eventTarget = event.target as HTMLVideoElement;
-  // height.value =
-  //   (eventTarget.videoHeight / eventTarget.videoWidth) * width.value;
-}
 </script>
 
 <template>
-  <video
-    :srcObject.prop="props.video.stream"
-    @canplay="canPlay"
-    @loadeddata="playVideo"
-  ></video>
+  <div class="position-relative">
+    <video :srcObject="props.video.stream" @loadeddata="playVideo" />
+    <TypographyText
+      class="userName"
+      :element="TypographyElements.H4"
+      color="white"
+    >
+      {{
+        `${props.video.user?.firstName} ${props.video.user?.lastName
+          .charAt(0)
+          .toUpperCase()}.`
+      }}
+    </TypographyText>
+  </div>
 </template>
 
 <style scoped>
 video {
+  background-color: black;
+  width: 100%;
   border-radius: 15px;
   -webkit-box-shadow: 14px 14px 20px 0 rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 14px 14px 20px 0 rgba(0, 0, 0, 0.1);
   box-shadow: 14px 14px 20px 0 rgba(0, 0, 0, 0.1);
+  transform: rotateY(180deg);
+}
+
+.userName {
+  position: absolute;
+  display: block;
+  right: 20px;
+  top: 20px;
 }
 </style>

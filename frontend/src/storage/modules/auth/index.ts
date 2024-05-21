@@ -6,8 +6,7 @@ export const auth = {
   namespaced: true,
   state: {
     token: null,
-    userId: null,
-    token: null,
+    user: null,
   },
   actions: {
     login({ commit }, authModel: AuthModel) {
@@ -29,15 +28,15 @@ export const auth = {
   mutations: {
     loginSuccess(state, loginResult) {
       state.token = loginResult.token;
-      state.userId = loginResult.userId;
+      state.user = loginResult.user;
     },
     loginFailure(state) {
       state.token = null;
-      state.userId = null;
+      state.user = null;
     },
     logout(state) {
       state.token = null;
-      state.userId = null;
+      state.user = null;
     },
   },
 };

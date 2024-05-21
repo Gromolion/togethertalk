@@ -3,7 +3,7 @@ import Peer from "peerjs";
 export default function (id: string, token: string, path?: string) {
   return new Peer(id, {
     path: path,
-    host: "127.0.0.1",
+    host: "localhost",
     port: 3000,
     config: {
       iceServers: [
