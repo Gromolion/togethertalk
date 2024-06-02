@@ -8,6 +8,7 @@ import { userDecoder } from "@/services/api/decoders/user/userDecoder";
 export const loginDecoder = succeed({})
   .assign("token", orNull(field("token", string)))
   .assign("user", orNull(field("user", userDecoder)))
+  .assign("expiresIn", orNull(field("user", number)))
   .andThen(toObject(LoginResult));
 
 export type LoginResultInterface = ExtractDecoderType<

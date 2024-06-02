@@ -2,10 +2,13 @@
 import { Video } from "@/components/ChatRoom/types";
 import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
+import { computed } from "vue";
 
 const props = defineProps<{
   video: Video;
 }>();
+
+const stream = computed(() => props.video.stream);
 
 function playVideo(event: Event) {
   const eventTarget = event.target as HTMLVideoElement;
@@ -15,7 +18,7 @@ function playVideo(event: Event) {
 
 <template>
   <div class="position-relative">
-    <video :srcObject="props.video.stream" @loadeddata="playVideo" />
+    <video :srcObject="stream" @loadeddata="playVideo" />
     <TypographyText
       class="userName"
       :element="TypographyElements.H4"

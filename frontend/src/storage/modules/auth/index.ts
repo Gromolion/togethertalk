@@ -1,11 +1,11 @@
 import AuthModel from "@/storage/modules/auth/AuthModel";
 import { AuthGateway } from "@/services/api/gateway/auth.gateway";
 import { ToastsTypes } from "@/enums/toastsTypes";
+import { AuthCookieStorage } from "@/storage/modules/auth/authCookieStorage";
 
 export const auth = {
   namespaced: true,
   state: {
-    token: null,
     user: null,
   },
   actions: {
@@ -27,16 +27,21 @@ export const auth = {
   },
   mutations: {
     loginSuccess(state, loginResult) {
-      state.token = loginResult.token;
       state.user = loginResult.user;
+      const expiresAt = new Date();
+      expiresAt.setSeconds(expiresAt.getSeconds() + loginResult.expiresIn);
+      AuthCookieStorage.set(loginResult.token, expiresAt);
     },
-    loginFailure(state) {
-      state.token = null;
-      state.user = null;
+    loginFailure() {
+      AuthCookieStorage.clear();
     },
-    logout(state) {
-      state.token = null;
-      state.user = null;
+    logout() {
+      AuthCookieStorage.clear();
+    },
+  },
+  getters: {
+    auth() {
+      return AuthCookieStorage.get();
     },
   },
 };

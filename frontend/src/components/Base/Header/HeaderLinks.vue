@@ -6,13 +6,18 @@ import AppRoutes from "@/storage/appState/appRoutes";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import Theme from "@/theme/theme";
+import { computed } from "vue";
 
 const store = useStore();
 const router = useRouter();
 
+const token = computed(() => store.getters["auth/auth"].token);
+
 const handleLogout = async () => {
   await store.dispatch("auth/logout");
-  await router.push({ path: AppRoutes.getAuthorizationUrl() });
+  console.log(store.getters["auth/auth"].token);
+  await router.push({ path: AppRoutes.getAuthorizationUrl(), reload: true });
+  router.go();
 };
 </script>
 
@@ -33,7 +38,7 @@ const handleLogout = async () => {
       >
     </AppLink>
     <TypographyText
-      v-if="store.state.auth.token"
+      v-if="token"
       :element="TypographyElements.H5"
       :hoverColor="Theme.textColors.linkHover"
       style="cursor: pointer"

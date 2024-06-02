@@ -3,6 +3,7 @@ import { reactive } from "vue";
 export default class ChatActions {
   public enableVideo = false;
   public enableAudio = false;
+  public enableDemonstration = false;
   public showChat = false;
   public showUsers = true;
 
@@ -16,6 +17,11 @@ export default class ChatActions {
 
   toggleAudio() {
     this.enableAudio = !this.enableAudio;
+  }
+
+  toggleDemonstration() {
+    this.enableDemonstration = !this.enableDemonstration;
+    if (this.enableDemonstration) this.enableVideo = false;
   }
 
   toggleChat() {

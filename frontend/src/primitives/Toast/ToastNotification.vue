@@ -23,10 +23,21 @@ const getBorderStyle = (toast) => {
 
 <template>
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div class="toast show collapse" role="alert" aria-live="assertive" aria-atomic="true"
-         @click="handleToastClose(toast)"
-         v-for="toast in store.state.toast.toasts" v-bind:key="toast.uid" :style="{border: getBorderStyle(toast)}">
-      <div v-if="toast.title" class="toast-header" :style="{'border-bottom': getBorderStyle(toast)}">
+    <div
+      class="toast show collapse"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      @click="handleToastClose(toast)"
+      v-for="toast in store.state.toast.toasts"
+      v-bind:key="toast.uid"
+      :style="{ border: getBorderStyle(toast) }"
+    >
+      <div
+        v-if="toast.title"
+        class="toast-header"
+        :style="{ 'border-bottom': getBorderStyle(toast) }"
+      >
         <strong class="me-auto">{{ toast.title }}</strong>
       </div>
       <div class="toast-body">{{ toast.message }}</div>

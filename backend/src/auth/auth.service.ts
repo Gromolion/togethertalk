@@ -31,6 +31,7 @@ export class AuthService {
     return {
       user: user,
       token: await this.grantAccessToken(user),
+      expiresIn: 18000,
     };
   }
 

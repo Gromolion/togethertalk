@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import AuthModel from "@/storage/modules/auth/AuthModel";
 import InputField from "@/primitives/Input/InputField.vue";
 import { useStore } from "vuex";
@@ -26,13 +26,12 @@ const handleSubmit = async () => {
 
     loading.value = false;
 
-    if (store.state.auth.token) {
-      await router.push({ path: AppRoutes.getMainUrl() });
-    }
+    await router.push({ path: AppRoutes.getMainUrl() });
+    router.go();
   } catch (e) {
     loading.value = false;
 
-    store.dispatch("toast/new", {
+    await store.dispatch("toast/new", {
       title: "Произошла ошибка",
       message: e.message,
       type: ToastsTypes.ERROR,

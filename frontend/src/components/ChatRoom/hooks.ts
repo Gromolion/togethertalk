@@ -20,7 +20,7 @@ export function useInitVideoChat(
   const socket = useSocket("chat-room", {
     extraHeaders: {
       "Chat-Room-UUID": roomId,
-      authorization: `Bearer ${store.state.auth.token}`,
+      authorization: `Bearer ${store.getters["auth/auth"].token}`,
     },
   });
 
@@ -51,6 +51,8 @@ function onFulfilled(
     const enableVideo = computed(() => actions.enableVideo);
     const enableAudio = computed(() => actions.enableAudio);
 
+    const videoTrack = stream.getVideoTracks()[0];
+
     const selfVideo = reactive({
       socketId: socket.id,
       stream: myStream,
@@ -66,17 +68,65 @@ function onFulfilled(
       watchVideoCallback(myStream, stream, selfVideo, socket),
       { immediate: true }
     );
+
+    const demonstrationTrack = ref(null);
+    watch(
+      () => actions.enableDemonstration,
+      async (enableDemonstration) => {
+        if (!enableDemonstration) {
+          demonstrationTrack.value &&
+            stream.removeTrack(demonstrationTrack.value);
+
+          stream.addTrack(videoTrack);
+
+          return;
+        }
+
+        try {
+          actions.enableVideo = false;
+
+          demonstrationTrack.value = (
+            await navigator.mediaDevices.getDisplayMedia({
+              video: { cursor: "always" },
+              audio: false,
+            })
+          ).getVideoTracks()[0];
+        } catch (error) {
+          actions.toggleDemonstration();
+          stream.addTrack(videoTrack);
+
+          return;
+        }
+
+        stream.removeTrack(videoTrack);
+        stream.addTrack(demonstrationTrack.value);
+
+        console.log(stream.getTracks());
+
+        socket.emit("videoTrackChange");
+      }
+    );
     watch(enableAudio, watchAudioCallback(stream, selfVideo, socket), {
       immediate: true,
     });
 
-    const peer = usePeer(socket.id, store.state.auth.token, "/peerjs");
+    const peer = usePeer(
+      socket.id,
+      store.getters["auth/auth"].token,
+      "/peerjs"
+    );
 
     peer.on(`open`, (id: string) => {
       socket.emit(`join-room`, id);
     });
 
-    peer.on(`call`, peerOnCall(stream, videos));
+    peer.on(
+      `call`,
+      peerOnCall(
+        actions.enableDemonstration ? demonstrationStream : stream,
+        videos
+      )
+    );
 
     socket.on(
       `user-connected`,

@@ -4,7 +4,6 @@ import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
-  @Exclude()
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -14,37 +13,32 @@ export class User {
   })
   login: string;
 
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   @Column({
     nullable: false,
   })
   password: string;
 
-  @Exclude()
   @Column({
     nullable: false,
   })
   email: string;
 
-  @Exclude()
   @Column({
     nullable: false,
   })
   firstName: string;
 
-  @Exclude()
   @Column({
     nullable: false,
   })
   lastName: string;
 
-  @Exclude()
   @Column({
     nullable: true,
   })
   position: string;
 
-  @Exclude()
   @Column('simple-array', {
     nullable: false,
     array: true,

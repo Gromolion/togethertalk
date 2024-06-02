@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { computed, createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 import App from "@/App.vue";
@@ -37,20 +37,26 @@ app.use(router);
 app.use(store);
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some((route) => route.meta.availableWithoutAuth)) next();
-
-  if (store.state.auth.token) {
+  if (to.matched.some((route) => route.meta.availableWithoutAuth)) {
     next();
-  } else {
-    next(AppRoutes.getAuthorizationUrl());
+    return;
   }
+
+  const token = computed(() => store.getters["auth/auth"].token);
+
+  if (token.value) {
+    next();
+    return;
+  }
+  next(AppRoutes.getAuthorizationUrl());
 });
 router.beforeEach((to, from, next) => {
-  if (
-    store.state.auth.token &&
-    to.matched.some((route) => route.meta.onlyWithoutAuth)
-  )
+  const token = computed(() => store.getters["auth/auth"].token);
+
+  if (token.value && to.matched.some((route) => route.meta.onlyWithoutAuth)) {
     next(AppRoutes.getMainUrl());
+    return;
+  }
 
   next();
 });
