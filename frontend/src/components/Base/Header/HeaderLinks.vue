@@ -15,22 +15,37 @@ const token = computed(() => store.getters["auth/auth"].token);
 
 const handleLogout = async () => {
   await store.dispatch("auth/logout");
-  console.log(store.getters["auth/auth"].token);
+
   await router.push({ path: AppRoutes.getAuthorizationUrl(), reload: true });
   router.go();
 };
+
+const currentRoute = computed(() => router.currentRoute.value);
 </script>
 
 <template>
-  <div id="header-links-container">
-    <AppLink class="header-link" :url="AppRoutes.getMainUrl()">
+  <div id="header-links-container" v-if="token">
+    <AppLink
+      class="header-link"
+      :url="AppRoutes.getMainUrl()"
+      :class="{
+        currentLink: [
+          AppRoutes.getMainUrl(),
+          AppRoutes.getMainCalendarUrl(),
+        ].includes(currentRoute.path),
+      }"
+    >
       <TypographyText
         :element="TypographyElements.H5"
         :hoverColor="Theme.textColors.linkHover"
         >Главная</TypographyText
       >
     </AppLink>
-    <AppLink class="header-link" :url="AppRoutes.getChatRoomUrl()">
+    <AppLink
+      class="header-link"
+      :url="AppRoutes.getChatRoomUrl()"
+      :class="{ currentLink: currentRoute.path === AppRoutes.getChatRoomUrl() }"
+    >
       <TypographyText
         :element="TypographyElements.H5"
         :hoverColor="Theme.textColors.linkHover"
@@ -38,7 +53,6 @@ const handleLogout = async () => {
       >
     </AppLink>
     <TypographyText
-      v-if="token"
       :element="TypographyElements.H5"
       :hoverColor="Theme.textColors.linkHover"
       style="cursor: pointer"
@@ -53,5 +67,9 @@ const handleLogout = async () => {
   display: flex;
   align-items: center;
   gap: 30px;
+}
+
+.currentLink {
+  border-bottom: 1px solid #5b5b5b;
 }
 </style>

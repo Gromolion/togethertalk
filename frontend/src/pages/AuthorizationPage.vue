@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import AuthModel from "@/storage/modules/auth/AuthModel";
 import InputField from "@/primitives/Input/InputField.vue";
 import { useStore } from "vuex";
 import { ToastsTypes } from "@/enums/toastsTypes";
 import { useRouter } from "vue-router";
 import AppRoutes from "@/storage/appState/appRoutes";
+import TypographyText from "@/primitives/Typography/TypographyText.vue";
+import { TypographyElements } from "@/primitives/Typography/enum";
 
 const togglePassword = ref(false);
 const togglePasswordIconHovered = ref(false);
@@ -42,7 +44,13 @@ const handleSubmit = async () => {
 
 <template>
   <div class="container pt-5 px-5 pb-4" id="authContainer">
-    <h5 id="authHeader" class="display-6">Авторизация</h5>
+    <TypographyText
+      id="authHeader"
+      class="display-6"
+      :element="TypographyElements.H5"
+    >
+      Авторизация
+    </TypographyText>
     <form @submit.prevent="handleSubmit">
       <div class="form-floating mb-4">
         <InputField

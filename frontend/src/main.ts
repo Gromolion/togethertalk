@@ -18,12 +18,14 @@ import { initMiddlewares } from "@/services/api/middlewares";
 
 const routes = [
   { path: AppRoutes.getMainUrl(), component: MainPage },
+  { path: AppRoutes.getMainCalendarUrl(), component: MainPage },
   {
     path: AppRoutes.getAuthorizationUrl(),
     component: AuthorizationPage,
     meta: { availableWithoutAuth: true, onlyWithoutAuth: true },
   },
   { path: AppRoutes.getChatRoomUrl(), component: ChatRoom },
+  { path: "/:pathMatch(.*)*", redirect: AppRoutes.getMainUrl() },
 ];
 
 const router = createRouter({

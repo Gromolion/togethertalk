@@ -6,16 +6,18 @@ type Props = {
   element: TypographyElements;
   color?: string;
   hoverColor?: string;
+  bold?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
   element: TypographyElements.SPAN,
   color: Theme.textColors.link,
+  bold: false,
 });
 </script>
 
 <template>
-  <component id="typography" :is="props.element">
+  <component id="typography" :is="props.element" :class="{ 'fw-bold': bold }">
     <slot></slot>
   </component>
 </template>

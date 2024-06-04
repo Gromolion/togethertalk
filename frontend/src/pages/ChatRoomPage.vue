@@ -24,7 +24,6 @@ const videosLength = computed(
 const videoRowsRule = {
   1: "video-row-1",
   2: "video-row-2",
-  5: "video-row-5",
 };
 
 const inRow = computed(() =>
@@ -156,9 +155,5 @@ const disconnect = () => {
 
 .video-row-2 {
   width: 49.5%;
-}
-
-.video-row-5 {
-  width: 24%;
 }
 </style>
