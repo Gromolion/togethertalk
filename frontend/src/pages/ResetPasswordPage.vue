@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import AuthModel from "@/storage/modules/auth/AuthModel";
 import InputField from "@/primitives/Input/InputField.vue";
 import { useStore } from "vuex";
 import { ToastsTypes } from "@/enums/toastsTypes";
@@ -8,30 +7,28 @@ import { useRouter } from "vue-router";
 import AppRoutes from "@/storage/appState/appRoutes";
 import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
-import Theme from "@/theme/theme";
-import AppLink from "@/primitives/App/AppLink.vue";
 
-const togglePassword = ref(false);
-const togglePasswordIconHovered = ref(false);
-
-const model = new AuthModel();
 const store = useStore();
 const router = useRouter();
+
+const login = ref(null);
 
 const loading = ref(false);
 
 const handleSubmit = async () => {
-  if (!model.isValid) return;
+  if (!login.value) return;
 
   loading.value = true;
 
   try {
-    await store.dispatch("auth/login", model);
+    const hash = await store.dispatch("auth/resetPassword", login.value);
 
     loading.value = false;
 
-    await router.push({ path: AppRoutes.getMainUrl() });
-    router.go();
+    await router.push({
+      name: "resetPasswordByHash",
+      params: { hash: hash },
+    });
   } catch (e) {
     loading.value = false;
 
@@ -57,56 +54,24 @@ const handleSubmit = async () => {
       <div class="form-floating mb-4">
         <InputField
           id="loginInput"
-          v-model="model.login"
+          v-model="login"
           class-name="form-control"
           placeholder="Логин"
           label="Логин"
-          :invalid="!!model.validationResult.causes.login"
+          :invalid="!login"
           autocomplete="username"
         />
       </div>
-      <div class="form-floating mb-4 d-flex">
-        <InputField
-          id="passwordInput"
-          v-model="model.password"
-          class-name="form-control"
-          placeholder="Пароль"
-          label="Пароль"
-          :invalid="!!model.validationResult.causes.password"
-          autocomplete="current-password"
-          :type="togglePassword ? 'text' : 'password'"
-        />
-        <i
-          class="bi h4"
-          :class="[
-            togglePassword ? 'bi-eye' : 'bi-eye-slash',
-            { 'opacity-75': !togglePasswordIconHovered },
-          ]"
-          id="togglePassword"
-          @click="togglePassword = !togglePassword"
-          @mouseover="togglePasswordIconHovered = true"
-          @mouseout="togglePasswordIconHovered = false"
-        />
-      </div>
-      <div
-        class="container d-flex gap-4 justify-content-center align-items-center"
-      >
+      <div class="container d-flex justify-content-center">
         <button
           type="submit"
           class="btn btn-outline-secondary px-5 py-2"
           :disabled="loading"
         >
           <TypographyText :element="TypographyElements.SPAN">
-            Войти
+            Восстановить доступ
           </TypographyText>
         </button>
-        <AppLink :url="AppRoutes.getResetPasswordUrl()">
-          <TypographyText
-            :element="TypographyElements.SPAN"
-            :hoverColor="Theme.textColors.linkHover"
-            >Забыли пароль?</TypographyText
-          >
-        </AppLink>
       </div>
     </form>
   </div>
@@ -130,12 +95,5 @@ const handleSubmit = async () => {
   width: fit-content;
   background-color: #fff;
   margin: -25px;
-}
-
-#togglePassword {
-  position: absolute;
-  right: 20px;
-  top: 15px;
-  cursor: pointer;
 }
 </style>

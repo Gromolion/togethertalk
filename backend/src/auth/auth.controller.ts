@@ -3,7 +3,6 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
-  Logger,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -20,5 +19,24 @@ export class AuthController {
   @UseGuards(GuestGuard)
   login(@Body() loginDto: LoginUserDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(GuestGuard)
+  async resetPassword(@Body('login') login: string) {
+    return {
+      hash: await this.authService.resetPassword(login),
+    };
+  }
+
+  @Post('reset-password-by-hash')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(GuestGuard)
+  async resetPasswordByHash(
+    @Body('hash') hash: string,
+    @Body('password') password: string,
+  ) {
+    return this.authService.resetPasswordByHash(hash, password);
   }
 }

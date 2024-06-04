@@ -12,4 +12,10 @@ export const initMiddlewares = (store: Store) => {
       config.headers["Authorization"] = `Bearer ${token.value}`;
     }
   });
+
+  RequestManager.beforeErrorMiddleware.push(({ error }) => {
+    error.message = error.axiosError.response.data.message || error.message;
+
+    return error;
+  });
 };

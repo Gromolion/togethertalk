@@ -13,7 +13,15 @@ export class UserService {
     return await this.usersRepository.findOneBy({ login: username });
   }
 
+  async findByResetPasswordHash(hash: string): Promise<User | undefined> {
+    return await this.usersRepository.findOneBy({ resetPasswordHash: hash });
+  }
+
   async find(id: number): Promise<User | undefined> {
     return await this.usersRepository.findOneBy({ id: id });
+  }
+
+  async save(user: User) {
+    await this.usersRepository.save(user);
   }
 }

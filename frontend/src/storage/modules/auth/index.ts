@@ -16,13 +16,35 @@ export const auth = {
           return Promise.resolve(user);
         },
         (error) => {
-          commit("loginFailure", error);
+          commit("loginFailure");
           return Promise.reject(error);
         }
       );
     },
     logout({ commit }) {
       commit("logout");
+    },
+    resetPassword({ commit }, login: string) {
+      return AuthGateway.resetPassword(login).then(
+        (response) => {
+          return Promise.resolve(response.hash);
+        },
+        (error) => Promise.reject(error)
+      );
+    },
+    resetPasswordByHash(
+      { commit },
+      payload: { hash: string; password: string }
+    ) {
+      return AuthGateway.resetPasswordByHash(
+        payload.hash,
+        payload.password
+      ).then(
+        () => {
+          return Promise.resolve(true);
+        },
+        (error) => Promise.reject(error)
+      );
     },
   },
   mutations: {

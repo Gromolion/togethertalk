@@ -45,4 +45,10 @@ export class User {
     default: [Roles.USER],
   })
   roles: string[];
+
+  @Column({
+    nullable: true,
+  })
+  // @Exclude({ toPlainOnly: true })
+  resetPasswordHash: string;
 }

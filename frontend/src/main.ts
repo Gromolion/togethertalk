@@ -15,6 +15,8 @@ import "bootstrap";
 import { RequestManager } from "@/utils/request";
 import { store } from "@/storage";
 import { initMiddlewares } from "@/services/api/middlewares";
+import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
+import ResetPasswordByHashPage from "@/pages/ResetPasswordByHashPage.vue";
 
 const routes = [
   { path: AppRoutes.getMainUrl(), component: MainPage },
@@ -22,6 +24,17 @@ const routes = [
   {
     path: AppRoutes.getAuthorizationUrl(),
     component: AuthorizationPage,
+    meta: { availableWithoutAuth: true, onlyWithoutAuth: true },
+  },
+  {
+    path: AppRoutes.getResetPasswordUrl(),
+    component: ResetPasswordPage,
+    meta: { availableWithoutAuth: true, onlyWithoutAuth: true },
+  },
+  {
+    path: AppRoutes.getResetPasswordByHashUrl(),
+    name: "resetPasswordByHash",
+    component: ResetPasswordByHashPage,
     meta: { availableWithoutAuth: true, onlyWithoutAuth: true },
   },
   { path: AppRoutes.getChatRoomUrl(), component: ChatRoom },
