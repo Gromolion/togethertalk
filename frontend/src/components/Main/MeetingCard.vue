@@ -1,26 +1,41 @@
 <script setup lang="ts">
 import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
+import { UserInterface } from "@/services/api/decoders/user/userDecoder";
+import { Moment } from "moment";
+import { useStore } from "vuex";
+import { computed } from "vue";
+
+const props = defineProps<{
+  theme: string;
+  initiator: UserInterface;
+  participants: number;
+  meetAt: Moment;
+}>();
+
+const store = useStore();
+
+const user = computed(() => store.state.auth.user);
 </script>
 
 <template>
   <div class="meet p-4">
     <TypographyText color="#000206" :element="TypographyElements.H5">
-      Тема встречи
+      {{ theme }}
     </TypographyText>
     <TypographyText
       class="mt-3"
       color="#000206"
       :element="TypographyElements.P"
     >
-      Инициатор: Юрий Смирнов
+      Инициатор: {{ `${initiator.firstName} ${initiator.lastName}` }}
     </TypographyText>
     <TypographyText
       class="mt-2"
       color="#000206"
       :element="TypographyElements.P"
     >
-      Участников: 5
+      Участников: {{ participants }}
     </TypographyText>
 
     <TypographyText
@@ -28,10 +43,13 @@ import { TypographyElements } from "@/primitives/Typography/enum";
       color="#000206"
       :element="TypographyElements.P"
     >
-      В 14:15
+      В {{ meetAt.format("H:mm") }}
     </TypographyText>
-    <div class="d-flex justify-content-end gap-5 mt-3">
-      <button type="button" class="btn btn-outline-secondary px-3 py-2">
+    <div class="d-flex flex-column gap-2 mt-3">
+      <button type="button" class="btn btn-outline-secondary p-1">
+        Присоединиться
+      </button>
+      <button type="button" class="btn btn-outline-secondary p-1">
         Редактировать
       </button>
     </div>

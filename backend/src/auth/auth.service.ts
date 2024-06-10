@@ -49,8 +49,6 @@ export class AuthService {
     resetHash: string,
     password: string,
   ): Promise<true> {
-    this.logger.log(resetHash);
-    this.logger.log(password);
     const user = await this.userService.findByResetPasswordHash(resetHash);
 
     if (!user) {

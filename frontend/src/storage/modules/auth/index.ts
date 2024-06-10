@@ -52,7 +52,7 @@ export const auth = {
       state.user = loginResult.user;
       const expiresAt = new Date();
       expiresAt.setSeconds(expiresAt.getSeconds() + loginResult.expiresIn);
-      AuthCookieStorage.set(loginResult.token, expiresAt);
+      AuthCookieStorage.set(loginResult.token, expiresAt, loginResult.userId);
     },
     loginFailure() {
       AuthCookieStorage.clear();

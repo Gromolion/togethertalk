@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { ChatRoomModule } from './chat-room/chat-room.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { MeetModule } from './meet/meet.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module';
     ChatRoomModule,
     AuthModule,
     UserModule,
+    MeetModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,13 +4,11 @@ import Model from "@/appEntry/Model";
 
 export default class AuthModel extends Model {
   @IsNotEmpty()
-  public login: string = '';
+  public login: string = "";
   @IsNotEmpty()
-  public password: string = '';
+  public password: string = "";
 
   constructor() {
     super(["login", "password"]);
-
-    return reactive(this);
   }
 }

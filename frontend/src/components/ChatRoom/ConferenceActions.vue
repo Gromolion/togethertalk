@@ -60,7 +60,12 @@ const handleLeave = () => {
     >
       <i class="bi bi bi-people" />
     </button>
-    <button type="button" id="leave" @click="handleLeave" class="px-3">
+    <button
+      type="button"
+      id="leave"
+      @click="handleLeave"
+      class="px-3 w-auto h-auto ms-auto btn btn-outline-secondary"
+    >
       Выйти
     </button>
   </div>
@@ -71,7 +76,7 @@ const handleLeave = () => {
   border-top: 1px solid #a9a9a9;
 }
 
-button {
+button:not(#leave) {
   width: 60px;
   height: 60px;
   border: 1px solid #a9a9a9;
@@ -95,17 +100,6 @@ button.active {
 #enableDemonstration.active {
   background-color: #87ff67;
   border: 1px solid #56a640;
-}
-
-#leave {
-  background-color: #e55555;
-  border: 1px solid red;
-  width: auto;
-  height: auto;
-  margin-left: auto;
-}
-#leave:hover {
-  background-color: #c74a4a;
 }
 
 i {

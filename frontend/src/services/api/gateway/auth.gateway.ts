@@ -32,7 +32,6 @@ export class AuthGateway {
     return RequestManager.createRequest({
       url: "/auth/reset-password-by-hash",
       method: METHODS.POST,
-      serverDataDecoder: null,
     })({ body: { hash: hash, password: password } });
   }
 }

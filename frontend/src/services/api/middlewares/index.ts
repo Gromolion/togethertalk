@@ -14,7 +14,7 @@ export const initMiddlewares = (store: Store) => {
   });
 
   RequestManager.beforeErrorMiddleware.push(({ error }) => {
-    error.message = error.axiosError.response.data.message || error.message;
+    error.message = error.axiosError?.response.data.message || error.message;
 
     return error;
   });

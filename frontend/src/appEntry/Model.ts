@@ -13,7 +13,11 @@ export default abstract class Model {
     causes: {},
   });
 
-  protected constructor() {}
+  protected constructor(validateFields: string[] = []) {
+    this.validateFields = validateFields;
+
+    return reactive(this);
+  }
 
   get isValid() {
     const classValidatorErrors = validateSync(this);

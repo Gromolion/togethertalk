@@ -1,129 +1,69 @@
 <script setup lang="ts">
 import MeetingCard from "@/components/Main/MeetingCard.vue";
-import { TypographyElements } from "@/primitives/Typography/enum";
-import { capitalizeFirst } from "@/utils/text";
-import TypographyText from "@/primitives/Typography/TypographyText.vue";
-import { computed, ref } from "vue";
-import moment, { Moment } from "moment";
+import DatePicker from "@/primitives/Calendar/DatePicker.vue";
+import { ref, watch } from "vue";
+import moment from "moment-timezone";
+import { MeetGateway } from "@/services/api/gateway/meet.gateway";
+import PlanMeetingModal from "@/components/Main/PlanMeetingModal.vue";
 
-const selectedDate = ref(moment().locale("ru"));
-const calendarHeader = computed(() =>
-  capitalizeFirst(selectedDate.value.format("MMMM YYYY"))
-);
+const selectedDate = ref(null);
+const onCalendarSelect = (date) => (selectedDate.value = date);
 
-const weekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+const showPlanModal = ref(false);
+const list = ref([]);
 
-const days: Moment[] = computed(() => {
-  const start = selectedDate.value.clone().startOf("month").startOf("week");
-  const end = selectedDate.value.clone().endOf("month").endOf("week");
-
-  let daysList = [];
-  while (start <= end) {
-    daysList.push(start.clone());
-    start.add(1, "day");
-  }
-
-  return daysList;
+watch(selectedDate, (date) => {
+  MeetGateway.listForDate(moment(date).format("YYYY-MM-DD"), 1, 10).then(
+    (res) =>
+      (list.value = res.sort(
+        (meet1, meet2) =>
+          moment(meet1.meetAt).unix() - moment(meet2.meetAt).unix()
+      ))
+  );
 });
+
+const onAdd = (meet) => {
+  list.value.push(meet);
+  showPlanModal.value = false;
+};
 </script>
 
 <template>
   <div class="d-flex justify-content-between">
-    <div class="viewBlock calendar">
-      <div
-        class="d-flex justify-content-between align-items-center viewBlock calendarHeader w-100"
-      >
-        <TypographyText color="#000206" :element="TypographyElements.H5" bold>{{
-          calendarHeader
-        }}</TypographyText>
-        <div class="d-flex gap-2">
-          <button
-            @click="selectedDate = selectedDate.clone().subtract(1, 'months')"
-          >
-            <i class="bi bi-chevron-up fw-bold" />
-          </button>
-          <button @click="selectedDate = selectedDate.clone().add(1, 'months')">
-            <i class="bi bi-chevron-down fw-bold" />
-          </button>
-        </div>
-      </div>
-      <div class="bodyHeader d-flex">
-        <div class="calendarDay p-3" v-for="day in weekDays" :key="day">
-          <TypographyText
-            color="#000206"
-            :element="TypographyElements.SPAN"
-            bold
-          >
-            {{ day }}
-          </TypographyText>
-        </div>
-      </div>
-      <div class="body d-flex flex-wrap">
-        <div
-          class="calendarDay p-3"
-          :class="{ currentDay: selectedDate.format('L') === date.format('L') }"
-          v-for="date in days"
-          @click="selectedDate = date"
-          :key="date.format('L')"
-        >
-          <TypographyText
-            :color="
-              selectedDate.month() !== date.month() ? '#989595' : '#000206'
-            "
-            :element="TypographyElements.SPAN"
-            bold
-          >
-            {{ date.date() }}
-          </TypographyText>
-        </div>
-      </div>
-    </div>
+    <DatePicker class="viewBlock" @select="onCalendarSelect" />
     <div class="viewBlock">
       <div class="text-end">
-        <button type="button" class="btn btn-outline-secondary px-5 py-2">
-          <TypographyText color="#000206" :element="TypographyElements.H5">
-            Запланировать
-          </TypographyText>
+        <button
+          type="button"
+          class="btn btn-outline-secondary px-5 py-2"
+          @click="showPlanModal = true"
+        >
+          Запланировать
         </button>
       </div>
       <div class="list d-flex flex-wrap mt-4">
-        <MeetingCard class="meetingCard" />
-        <MeetingCard class="meetingCard" />
+        <MeetingCard
+          class="meetingCard"
+          v-for="meet in list"
+          :key="meet.id"
+          :theme="meet.theme"
+          :initiator="meet.initiator"
+          :participants="meet.participantsCount"
+          :meetAt="moment(meet.meetAt)"
+        />
       </div>
     </div>
+    <PlanMeetingModal
+      v-if="showPlanModal"
+      @close="showPlanModal = false"
+      @added="onAdd"
+    />
   </div>
 </template>
 
 <style scoped>
 .viewBlock {
   width: 47%;
-}
-
-.calendarHeader button {
-  background-color: #fff;
-  border: none;
-  border-radius: 10px;
-  width: 48px;
-  height: 48px;
-}
-
-.calendarHeader button:hover {
-  background-color: #e8e7e7ff;
-}
-
-.calendarDay {
-  width: 14.2857%;
-  text-align: center;
-  border-radius: 15px;
-}
-
-.body .calendarDay:hover {
-  background-color: #e8e7e7ff;
-  cursor: pointer;
-}
-
-.body .calendarDay.currentDay {
-  border: 2px solid black;
 }
 
 .list {

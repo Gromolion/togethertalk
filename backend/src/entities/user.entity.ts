@@ -49,6 +49,10 @@ export class User {
   @Column({
     nullable: true,
   })
-  // @Exclude({ toPlainOnly: true })
+  @Exclude({ toPlainOnly: true })
   resetPasswordHash: string;
+
+  get isAdmin(): boolean {
+    return this.roles.includes(Roles.ADMIN);
+  }
 }

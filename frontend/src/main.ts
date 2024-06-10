@@ -17,6 +17,7 @@ import { store } from "@/storage";
 import { initMiddlewares } from "@/services/api/middlewares";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
 import ResetPasswordByHashPage from "@/pages/ResetPasswordByHashPage.vue";
+import moment from "moment-timezone";
 
 const routes = [
   { path: AppRoutes.getMainUrl(), component: MainPage },
@@ -79,5 +80,7 @@ router.beforeEach((to, from, next) => {
 initMiddlewares(store);
 
 RequestManager.baseUrl = process.env.VUE_APP_API_URL;
+
+moment.tz.setDefault("Europe/Moscow");
 
 app.mount("#app");

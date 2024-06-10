@@ -41,23 +41,23 @@ const currentRoute = computed(() => router.currentRoute.value);
         >Главная</TypographyText
       >
     </AppLink>
-    <AppLink
-      class="header-link"
-      :url="AppRoutes.getChatRoomUrl()"
-      :class="{ currentLink: currentRoute.path === AppRoutes.getChatRoomUrl() }"
-    >
-      <TypographyText
-        :element="TypographyElements.H5"
-        :hoverColor="Theme.textColors.linkHover"
-        >Создать чат</TypographyText
-      >
-    </AppLink>
+    <!--    <AppLink-->
+    <!--      class="header-link"-->
+    <!--      :url="AppRoutes.getChatRoomUrl()"-->
+    <!--      :class="{ currentLink: currentRoute.path === AppRoutes.getChatRoomUrl() }"-->
+    <!--    >-->
+    <!--      <TypographyText-->
+    <!--        :element="TypographyElements.H5"-->
+    <!--        :hoverColor="Theme.textColors.linkHover"-->
+    <!--        >Создать чат</TypographyText-->
+    <!--      >-->
+    <!--    </AppLink>-->
     <TypographyText
       :element="TypographyElements.H5"
       :hoverColor="Theme.textColors.linkHover"
       style="cursor: pointer"
       @click="handleLogout()"
-      >Выйти</TypographyText
+      >Профиль</TypographyText
     >
   </div>
 </template>
