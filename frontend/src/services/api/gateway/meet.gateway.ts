@@ -32,4 +32,15 @@ export class MeetGateway {
       },
     });
   }
+
+  public static cancel(id: number) {
+    return RequestManager.createRequest({
+      url: "/meet",
+      method: METHODS.DELETE,
+    })({
+      body: {
+        id: id,
+      },
+    });
+  }
 }

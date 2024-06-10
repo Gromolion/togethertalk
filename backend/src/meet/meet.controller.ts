@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -36,5 +37,12 @@ export class MeetController {
       listDto.perPage,
       req['user'],
     );
+  }
+
+  @Delete('')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  cancel(@Body('id') id: number, @Req() req: Request) {
+    return this.meetService.cancel(id, req['user']);
   }
 }

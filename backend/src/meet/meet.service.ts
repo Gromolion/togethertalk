@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 import { Meet } from '../entities/meet.entity';
@@ -11,6 +11,7 @@ import * as moment from 'moment-timezone';
 
 @Injectable()
 export class MeetService {
+  private logger = new Logger();
   constructor(
     @InjectRepository(Meet) private readonly meetRepository: Repository<Meet>,
   ) {}
@@ -23,7 +24,7 @@ export class MeetService {
     let meet = new Meet(
       meetDto.theme,
       meetDto.description,
-      moment(meetDto.dateTime).toISOString(),
+      moment(meetDto.dateTime).unix(),
       initiator,
       meetHash,
     );
@@ -37,7 +38,7 @@ export class MeetService {
       theme: meet.theme,
       initiator: meet.initiator,
       participantsCount: meet.participants.length,
-      meetAt: meet.meetAt,
+      meetAt: moment.unix(meet.meetAt).format('YYYY-MM-DD HH:mm'),
       hash: meet.hash,
     };
   }
@@ -50,8 +51,10 @@ export class MeetService {
   ) {
     const qb = this.meetRepository.createQueryBuilder('meet');
 
-    qb.where('date(meet.meetAt) = :dateTime', {
-      dateTime: listAt,
+    qb.where('meet.meetAt >= :dateTime', {
+      dateTime: moment(listAt).subtract(15, 'minutes').unix(),
+    }).andWhere('meet.meetAt < :endDateTime', {
+      endDateTime: moment(listAt).endOf('day').subtract(15, 'minutes').unix(),
     });
 
     if (!user.isAdmin) {
@@ -65,6 +68,7 @@ export class MeetService {
           ),
         );
     }
+
     return (
       await qb
         .offset((page - 1) * perPage)
@@ -76,9 +80,31 @@ export class MeetService {
         theme: meet.theme,
         initiator: meet.initiator,
         participantsCount: meet.participants?.length ?? 0,
-        meetAt: moment(meet.meetAt).format('YYYY-MM-DD HH:mm'),
+        meetAt: moment.unix(meet.meetAt).format('YYYY-MM-DD HH:mm'),
         hash: meet.hash,
       };
     });
+  }
+
+  public async cancel(id: number, user: User) {
+    const meet = await this.meetRepository.findOne({
+      where: { id: id },
+      relations: {
+        initiator: true,
+      },
+    });
+
+    if (!meet) {
+      throw new BadRequestException('Встреча не найдена');
+    }
+
+    if (meet.initiator.id === user.id) {
+      await this.meetRepository.remove(meet);
+      return;
+    }
+
+    meet.participants = meet.participants.filter(
+      (participant) => participant.id !== user.id,
+    );
   }
 }

@@ -6,20 +6,18 @@ import moment from "moment-timezone";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 
 const showPlanModal = ref(false);
-const currentDate = moment().format("YYYY-MM-DD");
+const currentDate = moment().format("YYYY-MM-DD HH:mm");
 const list = ref([]);
 
-MeetGateway.listForDate(currentDate, 1, 10).then(
-  (res) =>
-    (list.value = res.sort(
-      (meet1, meet2) =>
-        moment(meet1.meetAt).unix() - moment(meet2.meetAt).unix()
-    ))
-);
+MeetGateway.listForDate(currentDate, 1, 10).then((res) => (list.value = res));
 
 const onAdd = (meet) => {
   list.value.push(meet);
   showPlanModal.value = false;
+};
+
+const onCancel = (id) => {
+  list.value = list.value.filter((meet) => meet.id !== id);
 };
 </script>
 
@@ -36,12 +34,17 @@ const onAdd = (meet) => {
   <div class="list d-flex flex-wrap mt-4">
     <MeetingCard
       class="meetingCard"
-      v-for="meet in list"
+      v-for="meet in list.sort(
+        (meet1, meet2) =>
+          moment(meet1.meetAt).unix() - moment(meet2.meetAt).unix()
+      )"
       :key="meet.id"
+      :id="meet.id"
       :theme="meet.theme"
       :initiator="meet.initiator"
       :participants="meet.participantsCount"
       :meetAt="moment(meet.meetAt)"
+      @cancel="onCancel"
     />
   </div>
   <PlanMeetingModal

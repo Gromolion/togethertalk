@@ -23,9 +23,8 @@ export class Meet {
 
   @Column({
     nullable: false,
-    type: 'timestamp without time zone',
   })
-  meetAt: string;
+  meetAt: number;
 
   @ManyToOne(() => User)
   initiator: User;
@@ -44,7 +43,7 @@ export class Meet {
   constructor(
     theme: string,
     description: string = '',
-    meetAt: string,
+    meetAt: number,
     initiator: User,
     hash: string,
   ) {

@@ -46,6 +46,7 @@ const onAdd = (meet) => {
           class="meetingCard"
           v-for="meet in list"
           :key="meet.id"
+          :id="meet.id"
           :theme="meet.theme"
           :initiator="meet.initiator"
           :participants="meet.participantsCount"

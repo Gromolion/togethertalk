@@ -5,17 +5,36 @@ import { UserInterface } from "@/services/api/decoders/user/userDecoder";
 import { Moment } from "moment";
 import { useStore } from "vuex";
 import { computed } from "vue";
+import { MeetGateway } from "@/services/api/gateway/meet.gateway";
+import { ToastsTypes } from "@/enums/toastsTypes";
 
-defineProps<{
+const props = defineProps<{
+  id: number;
   theme: string;
   initiator: UserInterface;
   participants: number;
   meetAt: Moment;
 }>();
 
+const emit = defineEmits(["cancel"]);
+
 const store = useStore();
 
 const user = computed(() => store.state.auth.user);
+
+const handleCancel = async () => {
+  try {
+    await MeetGateway.cancel(props.id);
+
+    emit("cancel", props.id);
+  } catch (e) {
+    await store.dispatch("toast/new", {
+      title: "Произошла ошибка",
+      message: e.message,
+      type: ToastsTypes.ERROR,
+    });
+  }
+};
 </script>
 
 <template>
@@ -60,6 +79,7 @@ const user = computed(() => store.state.auth.user);
         v-if="user.id === initiator.id"
         type="button"
         class="btn btn-outline-secondary p-1"
+        @click="handleCancel"
       >
         Отменить
       </button>
@@ -67,6 +87,7 @@ const user = computed(() => store.state.auth.user);
         v-if="user.id !== initiator.id"
         type="button"
         class="btn btn-outline-secondary p-1"
+        @click="handleCancel"
       >
         Отказаться
       </button>
