@@ -6,7 +6,7 @@ import { Moment } from "moment";
 import { useStore } from "vuex";
 import { computed } from "vue";
 
-const props = defineProps<{
+defineProps<{
   theme: string;
   initiator: UserInterface;
   participants: number;
@@ -49,8 +49,26 @@ const user = computed(() => store.state.auth.user);
       <button type="button" class="btn btn-outline-secondary p-1">
         Присоединиться
       </button>
-      <button type="button" class="btn btn-outline-secondary p-1">
+      <button
+        v-if="user.id === initiator.id"
+        type="button"
+        class="btn btn-outline-secondary p-1"
+      >
         Редактировать
+      </button>
+      <button
+        v-if="user.id === initiator.id"
+        type="button"
+        class="btn btn-outline-secondary p-1"
+      >
+        Отменить
+      </button>
+      <button
+        v-if="user.id !== initiator.id"
+        type="button"
+        class="btn btn-outline-secondary p-1"
+      >
+        Отказаться
       </button>
     </div>
   </div>
