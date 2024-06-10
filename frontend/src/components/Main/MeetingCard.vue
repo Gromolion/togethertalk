@@ -7,6 +7,8 @@ import { useStore } from "vuex";
 import { computed } from "vue";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 import { ToastsTypes } from "@/enums/toastsTypes";
+import AppRoutes from "@/storage/appState/appRoutes";
+import AppLink from "@/primitives/App/AppLink.vue";
 
 const props = defineProps<{
   id: number;
@@ -14,6 +16,7 @@ const props = defineProps<{
   initiator: UserInterface;
   participants: number;
   meetAt: Moment;
+  hash: string;
 }>();
 
 const emit = defineEmits(["cancel"]);
@@ -65,9 +68,11 @@ const handleCancel = async () => {
       В {{ meetAt.format("H:mm") }}
     </TypographyText>
     <div class="d-flex flex-column gap-2 mt-3">
-      <button type="button" class="btn btn-outline-secondary p-1">
-        Присоединиться
-      </button>
+      <AppLink
+        :url="AppRoutes.getChatRoomUrl() + `?roomId=${hash}`"
+        class="btn btn-outline-secondary p-1"
+        >Присоединиться</AppLink
+      >
       <button
         v-if="user.id === initiator.id"
         type="button"

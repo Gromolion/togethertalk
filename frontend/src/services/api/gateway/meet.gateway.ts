@@ -5,6 +5,7 @@ import {
   MeetShortInterface,
 } from "@/services/api/decoders/meet/meetShortDecoder";
 import { array } from "jsonous";
+import { orNull } from "@/services/api/decoders/commonDecoders";
 
 export class MeetGateway {
   public static create(meetModel: MeetModel): Promise<MeetShortInterface> {
@@ -40,6 +41,18 @@ export class MeetGateway {
     })({
       body: {
         id: id,
+      },
+    });
+  }
+
+  public static getByHash(hash: string) {
+    return RequestManager.createRequest({
+      url: "/meet/by-hash",
+      method: METHODS.GET,
+      serverDataDecoder: orNull(meetShortDecoder),
+    })({
+      body: {
+        hash: hash,
       },
     });
   }

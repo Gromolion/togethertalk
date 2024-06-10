@@ -45,4 +45,11 @@ export class MeetController {
   cancel(@Body('id') id: number, @Req() req: Request) {
     return this.meetService.cancel(id, req['user']);
   }
+
+  @Get('by-hash')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  getByHash(@Query('hash') hash: string) {
+    return this.meetService.getByHash(hash);
+  }
 }

@@ -1,7 +1,7 @@
 <script setup>
 import UserVideo from "@/components/ChatRoom/UserVideo.vue";
 import { useInitVideoChat } from "@/components/ChatRoom/hooks.ts";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { computed } from "vue";
 import ConferenceActions from "@/components/ChatRoom/ConferenceActions.vue";
 import ChatActions from "@/entities/chat/chatActions";
@@ -9,14 +9,30 @@ import { useStore } from "vuex";
 import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
 import ChatMember from "@/components/ChatRoom/ChatMember.vue";
+import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 
 const route = useRoute();
+const router = useRouter();
 const store = useStore();
 const actions = new ChatActions();
 
-const videoChat = computed(() => {
-  return useInitVideoChat(route.query.roomId?.toString(), actions, store);
+const roomId = route.query.roomId?.toString();
+if (!roomId) {
+  router.back();
+}
+
+MeetGateway.getByHash(roomId).then((meet) => {
+  if (!meet) {
+    router.back();
+  }
 });
+
+const videoChat = computed(() => useInitVideoChat(roomId, actions, store));
+
+if (!videoChat.value) {
+  router.back();
+}
+
 const videosLength = computed(
   () => Object.keys(videoChat.value.videos.value).length
 );

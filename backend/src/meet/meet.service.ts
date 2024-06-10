@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 import { Meet } from '../entities/meet.entity';
@@ -11,7 +11,6 @@ import * as moment from 'moment-timezone';
 
 @Injectable()
 export class MeetService {
-  private logger = new Logger();
   constructor(
     @InjectRepository(Meet) private readonly meetRepository: Repository<Meet>,
   ) {}
@@ -106,5 +105,20 @@ export class MeetService {
     meet.participants = meet.participants.filter(
       (participant) => participant.id !== user.id,
     );
+  }
+
+  public async getByHash(hash: string) {
+    const meet = await this.meetRepository.findOneBy({ hash: hash });
+
+    if (!meet) return null;
+
+    return {
+      id: meet.id,
+      theme: meet.theme,
+      initiator: meet.initiator,
+      participantsCount: meet.participants?.length ?? 0,
+      meetAt: moment.unix(meet.meetAt).format('YYYY-MM-DD HH:mm'),
+      hash: meet.hash,
+    };
   }
 }

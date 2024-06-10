@@ -44,6 +44,7 @@ const onCancel = (id) => {
       :initiator="meet.initiator"
       :participants="meet.participantsCount"
       :meetAt="moment(meet.meetAt)"
+      :hash="meet.hash"
       @cancel="onCancel"
     />
   </div>

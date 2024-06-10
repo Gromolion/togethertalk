@@ -51,6 +51,7 @@ const onAdd = (meet) => {
           :initiator="meet.initiator"
           :participants="meet.participantsCount"
           :meetAt="moment(meet.meetAt)"
+          :hash="meet.hash"
         />
       </div>
     </div>
