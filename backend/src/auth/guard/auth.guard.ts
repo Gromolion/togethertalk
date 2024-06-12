@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET || '',
       });
 
-      request['user'] = await this.userService.find(payload.id);
+      request['user'] = await this.userService.find(payload.userId);
     } catch {
       throw new UnauthorizedException();
     }
