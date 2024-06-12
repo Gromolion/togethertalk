@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -24,7 +25,14 @@ export class MeetController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   create(@Body() meetDto: MeetDto, @Req() req: Request) {
-    return this.meetService.create(meetDto, req['user']);
+    return this.meetService.save(meetDto, req['user']);
+  }
+
+  @Put('')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  update(@Body() meetDto: MeetDto, @Req() req: Request) {
+    return this.meetService.save(meetDto, req['user']);
   }
 
   @Get('list')
@@ -39,6 +47,13 @@ export class MeetController {
     );
   }
 
+  @Get('')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  detail(@Query('id') id: number, @Req() req: Request) {
+    return this.meetService.detail(id, req['user']);
+  }
+
   @Delete('')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
@@ -51,5 +66,26 @@ export class MeetController {
   @UseGuards(AuthGuard)
   getByHash(@Query('hash') hash: string) {
     return this.meetService.getByHash(hash);
+  }
+  @Post('add-participant')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  addParticipant(
+    @Body('meetId') meetId: number,
+    @Body('userId') userId: number,
+    @Req() req: Request,
+  ) {
+    return this.meetService.addParticipant(meetId, userId, req['user']);
+  }
+
+  @Delete('delete-participant')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  deleteParticipant(
+    @Body('meetId') meetId: number,
+    @Body('userId') userId: number,
+    @Req() req: Request,
+  ) {
+    return this.meetService.deleteParticipant(meetId, userId, req['user']);
   }
 }

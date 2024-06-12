@@ -29,10 +29,6 @@ MeetGateway.getByHash(roomId).then((meet) => {
 
 const videoChat = computed(() => useInitVideoChat(roomId, actions, store));
 
-if (!videoChat.value) {
-  router.back();
-}
-
 const videosLength = computed(
   () => Object.keys(videoChat.value.videos.value).length
 );

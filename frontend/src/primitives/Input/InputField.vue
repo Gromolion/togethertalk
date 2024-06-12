@@ -17,6 +17,8 @@ const props = withDefaults(
   }
 );
 
+defineEmits(["input"]);
+
 const model = defineModel();
 
 const firstRender = ref(true);
@@ -35,6 +37,7 @@ const onFocus = () => {
 
 <template>
   <textarea
+    @input="$emit('input', modelValue)"
     v-if="type === 'textarea'"
     :class="[props.className, { invalidInput: !firstRender && invalid }]"
     :id="props.id"
@@ -43,6 +46,7 @@ const onFocus = () => {
     :autocomplete="props.autocomplete"
   />
   <input
+    @input="$emit('input', modelValue)"
     :type="props.type"
     :class="[props.className, { invalidInput: !firstRender && invalid }]"
     :id="props.id"

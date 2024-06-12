@@ -4,7 +4,7 @@ import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
 import InputField from "@/primitives/Input/InputField.vue";
 import MeetModel from "@/storage/modules/meet/MeetModel";
-import { ref } from "vue";
+import { ref, defineModel } from "vue";
 import { ToastsTypes } from "@/enums/toastsTypes";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 import { useStore } from "vuex";
@@ -13,14 +13,19 @@ const emit = defineEmits(["close", "added"]);
 
 const store = useStore();
 
-const model = new MeetModel();
+const model = defineModel();
+if (!model.value) {
+  model.value = new MeetModel();
+}
 const loading = ref(false);
 
 const onSubmit = async () => {
-  if (!model.isValid) return;
+  if (!model.value.isValid) return;
 
   try {
-    const meet = await MeetGateway.create(model);
+    const meet = !model.value.id
+      ? await MeetGateway.create(model.value)
+      : await MeetGateway.update(model.value);
 
     loading.value = false;
 

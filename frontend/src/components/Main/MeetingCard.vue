@@ -1,35 +1,43 @@
 <script setup lang="ts">
 import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
-import { UserInterface } from "@/services/api/decoders/user/userDecoder";
-import { Moment } from "moment";
+import * as moment from "moment-timezone";
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed, defineAsyncComponent, ref } from "vue";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 import { ToastsTypes } from "@/enums/toastsTypes";
 import AppRoutes from "@/storage/appState/appRoutes";
 import AppLink from "@/primitives/App/AppLink.vue";
+import PlanMeetingModal from "@/components/Main/PlanMeetingModal.vue";
+import MeetModel from "@/storage/modules/meet/MeetModel";
+import { MeetDetailInterface } from "@/services/api/decoders/meet/meetDetailDecoder";
 
 const props = defineProps<{
-  id: number;
-  theme: string;
-  initiator: UserInterface;
-  participants: number;
-  meetAt: Moment;
-  hash: string;
+  meet: MeetDetailInterface;
 }>();
 
-const emit = defineEmits(["cancel"]);
+const meeting = ref(props.meet);
+
+const emit = defineEmits(["cancel", "change"]);
 
 const store = useStore();
 
 const user = computed(() => store.state.auth.user);
 
+const detailModalOpened = ref(false);
+
+const DetailAsyncModal = defineAsyncComponent(
+  () => import("@/components/Main/MeetingDetailed.vue")
+);
+
+const showUpdateModal = ref(false);
+const meetModel = MeetModel.fromMeet(meeting.value);
+
 const handleCancel = async () => {
   try {
-    await MeetGateway.cancel(props.id);
+    await MeetGateway.cancel(meeting.value.id);
 
-    emit("cancel", props.id);
+    emit("cancel", meeting.value.id);
   } catch (e) {
     await store.dispatch("toast/new", {
       title: "Произошла ошибка",
@@ -38,26 +46,41 @@ const handleCancel = async () => {
     });
   }
 };
+const handleAdd = (meet) => {
+  emit("change", meet);
+  showUpdateModal.value = false;
+};
+
+const handleAddParticipant = (user) => {
+  meeting.value.participants.push(user);
+};
+
+const handleRemoveParticipant = (id) => {
+  meeting.value.participants = meeting.value.participants.filter(
+    (user) => user.id !== id
+  );
+};
 </script>
 
 <template>
-  <div class="meet p-4">
+  <div class="meet p-4" @click="detailModalOpened = true">
     <TypographyText color="#000206" :element="TypographyElements.H5">
-      {{ theme }}
+      {{ meeting.theme }}
     </TypographyText>
     <TypographyText
       class="mt-3"
       color="#000206"
       :element="TypographyElements.P"
     >
-      Инициатор: {{ `${initiator.firstName} ${initiator.lastName}` }}
+      Инициатор:
+      {{ `${meeting.initiator.firstName} ${meeting.initiator.lastName}` }}
     </TypographyText>
     <TypographyText
       class="mt-2"
       color="#000206"
       :element="TypographyElements.P"
     >
-      Участников: {{ participants }}
+      Участников: {{ meeting.participants.length }}
     </TypographyText>
 
     <TypographyText
@@ -65,39 +88,57 @@ const handleCancel = async () => {
       color="#000206"
       :element="TypographyElements.P"
     >
-      В {{ meetAt.format("H:mm") }}
+      В {{ moment(meeting.meetAt).format("H:mm") }}
     </TypographyText>
     <div class="d-flex flex-column gap-2 mt-3">
       <AppLink
-        :url="AppRoutes.getChatRoomUrl() + `?roomId=${hash}`"
+        @click.stop
+        :url="AppRoutes.getChatRoomUrl() + `?roomId=${meeting.hash}`"
         class="btn btn-outline-secondary p-1"
         >Присоединиться</AppLink
       >
       <button
-        v-if="user.id === initiator.id"
+        @click.stop="showUpdateModal = true"
+        v-if="user.id === meeting.initiator.id"
         type="button"
         class="btn btn-outline-secondary p-1"
       >
         Редактировать
       </button>
       <button
-        v-if="user.id === initiator.id"
+        v-if="user.id === meeting.initiator.id"
         type="button"
         class="btn btn-outline-secondary p-1"
-        @click="handleCancel"
+        @click.stop="handleCancel"
       >
         Отменить
       </button>
       <button
-        v-if="user.id !== initiator.id"
+        v-if="user.id !== meeting.initiator.id"
         type="button"
         class="btn btn-outline-secondary p-1"
-        @click="handleCancel"
+        @click.stop="handleCancel"
       >
         Отказаться
       </button>
     </div>
   </div>
+  <Suspense>
+    <DetailAsyncModal
+      v-if="detailModalOpened"
+      :meet="meeting"
+      @close="detailModalOpened = false"
+      @cancel="handleCancel"
+      @addParticipant="handleAddParticipant"
+      @deleteParticipant="handleRemoveParticipant"
+    />
+  </Suspense>
+  <PlanMeetingModal
+    v-if="showUpdateModal"
+    @close="showUpdateModal = false"
+    @added="handleAdd"
+    v-model="meetModel"
+  />
 </template>
 
 <style scoped>

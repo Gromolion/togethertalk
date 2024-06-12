@@ -5,4 +5,6 @@ export default class {
   public static getResetPasswordUrl = () => "/auth/reset-password";
   public static getResetPasswordByHashUrl = () => "/auth/reset-password/:hash";
   public static getChatRoomUrl = () => "/chat-room";
+  public static getUsersUrl = () => "/users";
+  public static getReportUrl = () => "/report";
 }

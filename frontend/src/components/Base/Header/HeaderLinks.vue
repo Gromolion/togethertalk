@@ -7,6 +7,7 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import Theme from "@/theme/theme";
 import { computed } from "vue";
+import { RoleProvider } from "@/utils/role";
 
 const store = useStore();
 const router = useRouter();
@@ -39,6 +40,34 @@ const currentRoute = computed(() => router.currentRoute.value);
         :element="TypographyElements.H5"
         :hoverColor="Theme.textColors.linkHover"
         >Главная</TypographyText
+      >
+    </AppLink>
+    <AppLink
+      class="header-link"
+      v-if="RoleProvider.isAdmin(store.state.auth.user)"
+      :url="AppRoutes.getUsersUrl()"
+      :class="{
+        currentLink: currentRoute.path === AppRoutes.getUsersUrl(),
+      }"
+    >
+      <TypographyText
+        :element="TypographyElements.H5"
+        :hoverColor="Theme.textColors.linkHover"
+        >Сотрудники</TypographyText
+      >
+    </AppLink>
+    <AppLink
+      class="header-link"
+      v-if="RoleProvider.isAdmin(store.state.auth.user)"
+      :url="AppRoutes.getReportUrl()"
+      :class="{
+        currentLink: currentRoute.path === AppRoutes.getReportUrl(),
+      }"
+    >
+      <TypographyText
+        :element="TypographyElements.H5"
+        :hoverColor="Theme.textColors.linkHover"
+        >Отчет</TypographyText
       >
     </AppLink>
     <TypographyText
