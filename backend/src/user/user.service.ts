@@ -24,4 +24,19 @@ export class UserService {
   async save(user: User) {
     await this.usersRepository.save(user);
   }
+
+  findByQuery(query: string): Promise<User[]> {
+    const qb = this.usersRepository.createQueryBuilder('user');
+
+    const tokens = query.split(' ');
+
+    for (let i = 0; i < tokens.length; i++) {
+      if (!tokens[i]) continue;
+      qb.andWhere(
+        `user.firstName LIKE '%${tokens[i]}%' OR user.lastName LIKE '%${tokens[i]}%'`,
+      );
+    }
+
+    return qb.getMany();
+  }
 }

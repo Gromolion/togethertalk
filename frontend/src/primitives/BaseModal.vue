@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { inject } from "vue";
-
-// eslint-disable-next-line no-unused-vars
-const props = withDefaults(
+withDefaults(
   defineProps<{
     modalWidth: string;
   }>(),
   {
-    modalWidth: "fit-content",
+    modalWidth: "max-content",
   }
 );
 

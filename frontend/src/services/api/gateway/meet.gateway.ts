@@ -1,18 +1,27 @@
 import MeetModel from "@/storage/modules/meet/MeetModel";
 import { METHODS, RequestManager } from "@/utils/request";
-import {
-  meetShortDecoder,
-  MeetShortInterface,
-} from "@/services/api/decoders/meet/meetShortDecoder";
 import { array } from "jsonous";
+import {
+  meetDetailDecoder,
+  MeetDetailInterface,
+} from "@/services/api/decoders/meet/meetDetailDecoder";
 import { orNull } from "@/services/api/decoders/commonDecoders";
+import { participantDecoder } from "@/services/api/decoders/meet/participantDecoder";
 
 export class MeetGateway {
-  public static create(meetModel: MeetModel): Promise<MeetShortInterface> {
+  public static create(meetModel: MeetModel): Promise<MeetDetailInterface> {
     return RequestManager.createRequest({
       url: "/meet",
       method: METHODS.POST,
-      serverDataDecoder: meetShortDecoder,
+      serverDataDecoder: meetDetailDecoder,
+    })({ body: meetModel });
+  }
+
+  public static update(meetModel: MeetModel): Promise<MeetDetailInterface> {
+    return RequestManager.createRequest({
+      url: "/meet",
+      method: METHODS.PUT,
+      serverDataDecoder: meetDetailDecoder,
     })({ body: meetModel });
   }
 
@@ -20,16 +29,28 @@ export class MeetGateway {
     date: string,
     page: number,
     perPage: number
-  ): Promise<MeetShortInterface[]> {
+  ): Promise<MeetDetailInterface[]> {
     return RequestManager.createRequest({
       url: "/meet/list",
       method: METHODS.GET,
-      serverDataDecoder: array(meetShortDecoder),
+      serverDataDecoder: array(meetDetailDecoder),
     })({
       body: {
         listAt: date,
         page: page,
         perPage: perPage,
+      },
+    });
+  }
+
+  public static detail(id: number): Promise<MeetDetailInterface> {
+    return RequestManager.createRequest({
+      url: "/meet",
+      method: METHODS.GET,
+      serverDataDecoder: meetDetailDecoder,
+    })({
+      body: {
+        id: id,
       },
     });
   }
@@ -49,10 +70,35 @@ export class MeetGateway {
     return RequestManager.createRequest({
       url: "/meet/by-hash",
       method: METHODS.GET,
-      serverDataDecoder: orNull(meetShortDecoder),
+      serverDataDecoder: orNull(meetDetailDecoder),
     })({
       body: {
         hash: hash,
+      },
+    });
+  }
+
+  public static addParticipant(meetId: number, userId: number) {
+    return RequestManager.createRequest({
+      url: "/meet/add-participant",
+      method: METHODS.POST,
+      serverDataDecoder: participantDecoder,
+    })({
+      body: {
+        meetId: meetId,
+        userId: userId,
+      },
+    });
+  }
+
+  public static removeParticipant(meetId: number, userId: number) {
+    return RequestManager.createRequest({
+      url: "/meet/delete-participant",
+      method: METHODS.DELETE,
+    })({
+      body: {
+        meetId: meetId,
+        userId: userId,
       },
     });
   }

@@ -19,6 +19,10 @@ const onAdd = (meet) => {
 const onCancel = (id) => {
   list.value = list.value.filter((meet) => meet.id !== id);
 };
+const onChange = (source) => {
+  const target = list.value.find((meet) => meet.id === source.id);
+  Object.assign(target, source);
+};
 </script>
 
 <template>
@@ -39,13 +43,9 @@ const onCancel = (id) => {
           moment(meet1.meetAt).unix() - moment(meet2.meetAt).unix()
       )"
       :key="meet.id"
-      :id="meet.id"
-      :theme="meet.theme"
-      :initiator="meet.initiator"
-      :participants="meet.participantsCount"
-      :meetAt="moment(meet.meetAt)"
-      :hash="meet.hash"
+      :meet="meet"
       @cancel="onCancel"
+      @change="onChange"
     />
   </div>
   <PlanMeetingModal
