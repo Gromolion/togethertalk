@@ -8,6 +8,7 @@ import { ChatRoomModule } from './chat-room/chat-room.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MeetModule } from './meet/meet.module';
+import { InfoModule } from './info/info.module';
 
 @Module({
   imports: [
@@ -19,6 +20,8 @@ import { MeetModule } from './meet/meet.module';
     AuthModule,
     UserModule,
     MeetModule,
+    AppModule,
+    InfoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
