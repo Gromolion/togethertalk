@@ -1,13 +1,66 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
+import UserDto from './dto/user.dto';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
+
+  async createOrUpdate(dto: UserDto, currentUser: User) {
+    if (!currentUser.isAdmin && dto.id !== currentUser.id) {
+      throw new UnauthorizedException('Доступ запрещен');
+    }
+
+    let user: User;
+
+    if (
+      !dto.id ||
+      !(await this.usersRepository.exist({ where: { id: dto.id } }))
+    ) {
+      user = new User(
+        dto.login,
+        await hash(
+          dto.password,
+          parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS),
+        ),
+        dto.email,
+        dto.firstName,
+        dto.lastName,
+        dto.position,
+      );
+    } else {
+      user = await this.find(dto.id);
+      user.login = dto.login;
+      if (dto.password)
+        user.password = await hash(
+          dto.password,
+          parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS),
+        );
+      user.email = dto.email;
+      user.firstName = dto.firstName;
+      user.lastName = dto.lastName;
+      user.position = dto.position;
+    }
+
+    await this.save(user);
+  }
+
+  async list(page: number, perPage: number) {
+    return {
+      list: await this.usersRepository
+        .createQueryBuilder('user')
+        .offset((page - 1) * perPage)
+        .limit(perPage)
+        .orderBy('user.id', 'ASC')
+        .getMany(),
+      totalCount: await this.usersRepository.count(),
+    };
+  }
 
   async findUser(username: string): Promise<User | undefined> {
     return await this.usersRepository.findOneBy({ login: username });

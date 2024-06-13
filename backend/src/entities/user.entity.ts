@@ -4,7 +4,7 @@ import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column({
@@ -37,7 +37,7 @@ export class User {
   @Column({
     nullable: true,
   })
-  position: string;
+  position?: string;
 
   @Column('simple-array', {
     nullable: false,
@@ -51,6 +51,27 @@ export class User {
   })
   @Exclude({ toPlainOnly: true })
   resetPasswordHash: string;
+
+  @Column({
+    nullable: true,
+  })
+  avatar: string;
+
+  constructor(
+    login: string,
+    password: string,
+    email: string,
+    firstName: string,
+    lastName: string,
+    position?: string,
+  ) {
+    this.login = login;
+    this.password = password;
+    this.email = email;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.position = position;
+  }
 
   get isAdmin(): boolean {
     return this.roles.includes(Roles.ADMIN);

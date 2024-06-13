@@ -18,6 +18,7 @@ import { initMiddlewares } from "@/services/api/middlewares";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
 import ResetPasswordByHashPage from "@/pages/ResetPasswordByHashPage.vue";
 import moment from "moment-timezone";
+import UsersPage from "@/pages/UsersPage.vue";
 
 const routes = [
   { path: AppRoutes.getMainUrl(), component: MainPage },
@@ -39,6 +40,7 @@ const routes = [
     meta: { availableWithoutAuth: true, onlyWithoutAuth: true },
   },
   { path: AppRoutes.getChatRoomUrl(), component: ChatRoom },
+  { path: AppRoutes.getUsersUrl(), component: UsersPage },
   { path: "/:pathMatch(.*)*", redirect: AppRoutes.getMainUrl() },
 ];
 

@@ -61,7 +61,8 @@ const listSelected = computed(
   display: flex;
   gap: 8px;
   position: relative;
-  bottom: 47px;
+  bottom: 25px;
+  left: 20px;
   margin: -15px;
 }
 

@@ -47,9 +47,9 @@ const handleSubmit = async () => {
 <template>
   <div class="container pt-5 px-5 pb-4" id="authContainer">
     <TypographyText
-      id="authHeader"
-      class="display-6"
+      class="display-6 authHeader"
       :element="TypographyElements.H5"
+      color="#000206"
     >
       Авторизация
     </TypographyText>
@@ -123,9 +123,9 @@ const handleSubmit = async () => {
   box-shadow: 14px 14px 20px 0 rgba(0, 0, 0, 0.1);
 }
 
-#authHeader {
+.authHeader {
   position: relative;
-  bottom: 50px;
+  bottom: 75px;
   left: 2rem;
   width: fit-content;
   background-color: #fff;
