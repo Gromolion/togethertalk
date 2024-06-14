@@ -28,11 +28,18 @@ export interface RequestData {
   headers?: Record<string, string>;
 }
 
+export type onUploadProgressCallback = (progress: number) => void;
+
+export interface TrackRequestInterface<Data> {
+  send(requestData: RequestData): Promise<Data>;
+  onUploadProgress: (callback: onUploadProgressCallback) => void;
+  abort(message?: string): void;
+}
+
 export enum METHODS {
   POST = "post",
   GET = "get",
   PUT = "put",
-  PATCH = "patch",
   DELETE = "delete",
 }
 
@@ -55,6 +62,35 @@ export class RequestManager {
     config: AxiosRequestConfig;
     shareData: Record<string, any>;
   }) => AppRequestError | Promise<AppRequestError | null> | null)[] = [];
+
+  static createTrackedRequest<DecoderValue>(
+    params: CreateRequest<DecoderValue>
+  ) {
+    const cancelToken = axios.CancelToken.source();
+    const requestInstance = this.createRequest(params);
+    let onProgress = (() => {}) as any;
+
+    return {
+      async send(requestData: RequestData = {}) {
+        return requestInstance({
+          ...requestData,
+          options: {
+            ...requestData.options,
+            cancelToken: cancelToken.token,
+            progressReceiver: onProgress,
+          },
+        });
+      },
+
+      onUploadProgress: (callback: onUploadProgressCallback) => {
+        onProgress = callback;
+      },
+
+      abort(message?: string) {
+        cancelToken.cancel(message);
+      },
+    };
+  }
 
   static createRequest<DecoderValue>({
     url,

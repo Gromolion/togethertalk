@@ -8,15 +8,19 @@ import UserModel from "@/storage/modules/user/UserModel";
 import UserGateway from "@/services/api/gateway/user.gateway";
 import { ToastsTypes } from "@/enums/toastsTypes";
 import { useStore } from "vuex";
+import AppRoutes from "@/storage/appState/appRoutes";
+import { useRouter } from "vue-router";
 
-const emit = defineEmits(["close"]);
+defineEmits(["close"]);
 
 const store = useStore();
+const router = useRouter();
 
 const model = defineModel();
 if (!model.value) {
   model.value = new UserModel();
 }
+
 const loading = ref(false);
 
 const togglePassword = ref(false);
@@ -28,8 +32,8 @@ const onSubmit = async () => {
 
     await UserGateway.create(model.value);
 
-    loading.value = false;
-    emit("close");
+    await router.push({ path: AppRoutes.getUsersUrl() });
+    router.go();
   } catch (e) {
     loading.value = false;
 

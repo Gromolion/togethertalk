@@ -80,7 +80,7 @@ const excludeAutocompleteIds = computed(() =>
         </TypographyText>
         <div class="row align-items-center">
           <div
-            class="participant mb-2 col-3"
+            class="participant col-3"
             v-for="participant in meet.participants"
             :key="participant.id"
           >

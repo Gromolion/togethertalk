@@ -10,6 +10,7 @@ const props = withDefaults(
     type?: string;
     invalid?: boolean;
     autocomplete?: string;
+    accept?: string;
   }>(),
   {
     type: "text",
@@ -56,6 +57,7 @@ const onFocus = () => {
     v-model="model"
     v-else
     :autocomplete="props.autocomplete"
+    :accept="accept"
   />
   <label :for="props.id">{{ props.label }}</label>
 </template>

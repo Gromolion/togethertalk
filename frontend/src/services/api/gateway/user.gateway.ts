@@ -4,6 +4,7 @@ import {
   UserListInterface,
 } from "@/services/api/decoders/user/userListDecoder";
 import UserModel from "@/storage/modules/user/UserModel";
+import { string } from "jsonous";
 
 export default class UserGateway {
   public static create(user: UserModel) {
@@ -29,5 +30,31 @@ export default class UserGateway {
         perPage: perPage,
       },
     });
+  }
+
+  public static remove(id: number) {
+    return RequestManager.createRequest({
+      url: "user",
+      method: METHODS.DELETE,
+    })({
+      body: {
+        id: id,
+      },
+    });
+  }
+
+  public static setAvatar(id: number) {
+    return RequestManager.createTrackedRequest({
+      url: `user/${id}/avatar`,
+      method: METHODS.POST,
+      serverDataDecoder: string,
+    });
+  }
+
+  public static removeAvatar(id: number) {
+    return RequestManager.createRequest({
+      url: `user/${id}/avatar`,
+      method: METHODS.DELETE,
+    })();
   }
 }

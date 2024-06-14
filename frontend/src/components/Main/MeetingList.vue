@@ -36,17 +36,16 @@ const onChange = (source) => {
     </button>
   </div>
   <div class="list d-flex flex-wrap mt-4">
-    <MeetingCard
+    <div
       class="meetingCard"
       v-for="meet in list.sort(
         (meet1, meet2) =>
           moment(meet1.meetAt).unix() - moment(meet2.meetAt).unix()
       )"
       :key="meet.id"
-      :meet="meet"
-      @cancel="onCancel"
-      @change="onChange"
-    />
+    >
+      <MeetingCard :meet="meet" @cancel="onCancel" @change="onChange" />
+    </div>
   </div>
   <PlanMeetingModal
     v-if="showPlanModal"

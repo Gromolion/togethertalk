@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    modalWidth: string;
+    modalWidth?: string;
   }>(),
   {
     modalWidth: "max-content",

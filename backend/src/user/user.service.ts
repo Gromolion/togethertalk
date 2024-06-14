@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
@@ -50,6 +54,20 @@ export class UserService {
     await this.save(user);
   }
 
+  async delete(id: number, currentUser: User) {
+    if (!currentUser.isAdmin) {
+      throw new UnauthorizedException('Доступ запрещен');
+    }
+
+    const user = await this.find(id);
+
+    if (!user) {
+      throw new BadRequestException('Пользователь не найден');
+    }
+
+    await this.usersRepository.remove(user);
+  }
+
   async list(page: number, perPage: number) {
     return {
       list: await this.usersRepository
@@ -91,5 +109,39 @@ export class UserService {
     }
 
     return qb.getMany();
+  }
+
+  async setAvatar(id: number, avatar: Express.Multer.File, currentUser: User) {
+    if (!currentUser.isAdmin && id !== currentUser.id) {
+      throw new UnauthorizedException('Доступ запрещен');
+    }
+
+    const user = await this.find(id);
+
+    if (!user) {
+      throw new BadRequestException('Пользователь не найден');
+    }
+
+    user.avatar = avatar.buffer.toString('base64');
+
+    await this.usersRepository.save(user);
+
+    return user.avatar;
+  }
+
+  async removeAvatar(id: number, currentUser: User) {
+    if (!currentUser.isAdmin && id !== currentUser.id) {
+      throw new UnauthorizedException('Доступ запрещен');
+    }
+
+    const user = await this.find(id);
+
+    if (!user) {
+      throw new BadRequestException('Пользователь не найден');
+    }
+
+    user.avatar = null;
+
+    await this.usersRepository.save(user);
   }
 }
