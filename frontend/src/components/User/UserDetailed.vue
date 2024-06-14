@@ -16,9 +16,15 @@ import InputField from "@/primitives/Input/InputField.vue";
 import { prepareFileUploader } from "@/utils/request/prepareFileUploader";
 import { createBase64Image } from "@/utils/image";
 
-const props = defineProps<{
-  user: UserInterface;
-}>();
+const props = withDefaults(
+  defineProps<{
+    user: UserInterface;
+    withoutDelete: boolean;
+  }>(),
+  {
+    withoutDelete: false,
+  }
+);
 defineEmits(["close"]);
 
 const store = useStore();
@@ -171,7 +177,7 @@ const handleRemoveAvatar = async () => {
         Редактировать
       </button>
       <button
-        v-if="RoleProvider.isAdmin(currentUser)"
+        v-if="RoleProvider.isAdmin(currentUser) && !withoutDelete"
         type="button"
         class="btn btn-outline-secondary px-4 py-2"
         @click="handleRemove"
