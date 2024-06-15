@@ -9,12 +9,13 @@ import {
   Put,
   Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { MeetService } from './meet.service';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import MeetDto from './dto/meet.dto';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import ListDto from './dto/list.dto';
 import FilterDto from './dto/filter.dto';
 
@@ -95,5 +96,19 @@ export class MeetController {
   @UseGuards(AuthGuard)
   report(@Query() filter: FilterDto, @Req() req: Request) {
     return this.meetService.report(filter, req['user']);
+  }
+
+  @Get('report-download')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  async reportDownload(
+    @Query() filter: FilterDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const workbook = await this.meetService.reportDownload(filter, req['user']);
+    workbook.writeToBuffer().then((buffer) => {
+      res.end(Buffer.from(buffer).toString('base64'));
+    });
   }
 }

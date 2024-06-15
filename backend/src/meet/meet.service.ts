@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,10 +13,10 @@ import { hash } from 'bcrypt';
 import * as moment from 'moment-timezone';
 import { UserService } from '../user/user.service';
 import FilterDto from './dto/filter.dto';
+import * as excel from 'excel4node';
 
 @Injectable()
 export class MeetService {
-  private logger = new Logger();
   constructor(
     @InjectRepository(Meet) private readonly meetRepository: Repository<Meet>,
     private userService: UserService,
@@ -330,5 +329,56 @@ export class MeetService {
         hash: meet.hash,
       };
     });
+  }
+
+  async reportDownload(filter: FilterDto, user: User) {
+    const meets = await this.report(filter, user);
+
+    const workbook = new excel.Workbook();
+    const worksheet = workbook.addWorksheet('Встречи');
+
+    const headerStyle = workbook.createStyle({
+      font: {
+        bold: true,
+      },
+    });
+
+    worksheet.column(1).setWidth(5);
+    worksheet.column(2).setWidth(20);
+    worksheet.column(3).setWidth(40);
+    worksheet.column(4).setWidth(15);
+    worksheet.column(5).setWidth(15);
+    worksheet.column(6).setWidth(40);
+    worksheet.column(7).setWidth(20);
+
+    worksheet.cell(1, 1).string('ID').style(headerStyle);
+    worksheet.cell(1, 2).string('Тема').style(headerStyle);
+    worksheet.cell(1, 3).string('Описание').style(headerStyle);
+    worksheet.cell(1, 4).string('Инициатор').style(headerStyle);
+    worksheet.cell(1, 5).string('Дата и время').style(headerStyle);
+    worksheet.cell(1, 6).string('Участники').style(headerStyle);
+    worksheet.cell(1, 7).string('Хеш').style(headerStyle);
+
+    meets.forEach((meet, i) => {
+      worksheet.cell(i + 2, 1).number(meet.id);
+      worksheet.cell(i + 2, 2).string(meet.theme);
+      worksheet.cell(i + 2, 3).string(meet.description);
+      worksheet
+        .cell(i + 2, 4)
+        .string(meet.initiator.firstName + ' ' + meet.initiator.lastName);
+      worksheet
+        .cell(i + 2, 5)
+        .string(moment(meet.meetAt).format('DD.MM.YYYY H:mm'));
+      worksheet
+        .cell(i + 2, 6)
+        .string(
+          meet.participants
+            .map((user) => user.firstName + ' ' + user.lastName)
+            .join(', '),
+        );
+      worksheet.cell(i + 2, 7).string(meet.hash);
+    });
+
+    return workbook;
   }
 }

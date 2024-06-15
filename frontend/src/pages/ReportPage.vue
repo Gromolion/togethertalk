@@ -11,6 +11,7 @@ import MeetingCard from "@/components/Main/MeetingCard.vue";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 import { ToastsTypes } from "@/enums/toastsTypes";
 import { useStore } from "vuex";
+import { saveFileToUser } from "@/utils/file";
 
 const store = useStore();
 
@@ -28,6 +29,26 @@ const handleReport = async () => {
   model.users = users.value.map((user) => user.id);
   try {
     list.value = await MeetGateway.report(model);
+    loading.value = false;
+  } catch (e) {
+    loading.value = false;
+
+    await store.dispatch("toast/new", {
+      title: "Произошла ошибка",
+      message: e.message,
+      type: ToastsTypes.ERROR,
+    });
+  }
+};
+
+const handleReportDownload = async () => {
+  loading.value = true;
+
+  model.page = 1;
+  model.perPage = 10;
+  model.users = users.value.map((user) => user.id);
+  try {
+    saveFileToUser("report.xlsx", await MeetGateway.reportDownload(model));
     loading.value = false;
   } catch (e) {
     loading.value = false;
@@ -124,6 +145,7 @@ const handleSelectUser = (item) => users.value.push(item);
       <button
         class="btn btn-outline-secondary px-3 py-2 w-25"
         :disabled="loading"
+        @click="handleReportDownload"
       >
         Выгрузить
       </button>
