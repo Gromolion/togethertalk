@@ -7,3 +7,11 @@ export type Video = {
   enableVideo: boolean;
   enableAudio: boolean;
 };
+
+export type Message = {
+  user: string;
+  type: "text" | "file";
+  content: string;
+  time: string;
+  mine: boolean;
+};

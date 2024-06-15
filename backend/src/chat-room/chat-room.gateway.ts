@@ -72,4 +72,21 @@ export class ChatRoomGateway implements OnGatewayDisconnect {
 
     client.to(`room_${chatRoomUUID}`).emit(`audioTrackChanged`, body);
   }
+
+  @UseGuards(AuthGuard)
+  @SubscribeMessage('sendMessage')
+  async handleNewMessage(
+    client: Socket,
+    body: {
+      user: string;
+      type: 'text' | 'file';
+      content: string;
+      time: string;
+    },
+  ) {
+    const chatRoomUUID: string =
+      client.handshake.headers['chat-room-uuid']?.toString();
+
+    client.to(`room_${chatRoomUUID}`).emit(`newMessage`, body);
+  }
 }

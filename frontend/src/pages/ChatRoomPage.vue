@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import UserVideo from "@/components/ChatRoom/UserVideo.vue";
 import { useInitVideoChat } from "@/components/ChatRoom/hooks.ts";
 import { useRoute, useRouter } from "vue-router";
-import { computed } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import ConferenceActions from "@/components/ChatRoom/ConferenceActions.vue";
 import ChatActions from "@/entities/chat/chatActions";
 import { useStore } from "vuex";
@@ -10,6 +10,8 @@ import TypographyText from "@/primitives/Typography/TypographyText.vue";
 import { TypographyElements } from "@/primitives/Typography/enum";
 import ChatMember from "@/components/ChatRoom/ChatMember.vue";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
+import InputField from "@/primitives/Input/InputField.vue";
+import moment from "moment-timezone";
 
 const route = useRoute();
 const router = useRouter();
@@ -56,6 +58,44 @@ const groupedVideos = computed(() => {
 const disconnect = () => {
   videoChat.value.socket.disconnect();
 };
+
+const messageModel = ref("");
+const handleSendMessage = (type: string) => {
+  videoChat.value.chat.value.push({
+    user:
+      store.state.auth.user.firstName + " " + store.state.auth.user.lastName,
+    type: type,
+    content: messageModel.value,
+    time: moment().format("H:mm"),
+    mine: true,
+  });
+  videoChat.value.socket.emit("sendMessage", {
+    user:
+      store.state.auth.user.firstName + " " + store.state.auth.user.lastName,
+    type: type,
+    content: messageModel.value,
+    time: moment().format("H:mm"),
+  });
+};
+
+const videoGridEl = ref(null);
+const sideBlockMaxHeight = ref(0);
+const resizeObserver = ref(null);
+onMounted(() => {
+  resizeObserver.value = new ResizeObserver(
+    (entries: ResizeObserverEntry[]) => {
+      window.requestAnimationFrame((): void | undefined => {
+        if (!Array.isArray(entries) || !entries.length) {
+          return;
+        }
+
+        sideBlockMaxHeight.value = videoGridEl.value.clientHeight + "px";
+      });
+    }
+  );
+  resizeObserver.value?.observe(videoGridEl.value);
+});
+onBeforeUnmount(() => resizeObserver.value?.unobserve(videoGridEl.value));
 </script>
 
 <template>
@@ -71,6 +111,7 @@ const disconnect = () => {
     <div class="chatRoom d-flex">
       <div
         class="videoGrid p-4"
+        ref="videoGridEl"
         :class="{ fullWidth: !actions.showChat && !actions.showUsers }"
       >
         <div
@@ -87,23 +128,61 @@ const disconnect = () => {
           />
         </div>
       </div>
-      <div
-        class="sideBlock"
-        :class="{ collapsed: !actions.showChat && !actions.showUsers }"
-      >
+      <div v-if="actions.showUsers || actions.showChat" class="sideBlock">
         <div
-          class="chat-container sideBlockContainer p-4"
-          :class="{
-            collapsed: !actions.showChat,
-          }"
+          class="chat-container sideBlockContainer p-4 d-flex flex-column justify-content-between"
+          v-if="actions.showChat"
         >
-          <TypographyText :element="TypographyElements.H4">Чат</TypographyText>
+          <TypographyText class="mb-3" :element="TypographyElements.H4"
+            >Чат</TypographyText
+          >
+          <div class="overflow-auto h-100">
+            <div
+              class="messages pb-3 d-flex flex-column gap-2 justify-content-end"
+            >
+              <div
+                class="message p-2"
+                :class="{ 'ms-auto': message.mine }"
+                v-for="message in videoChat.chat.value"
+                :key="message"
+              >
+                <div class="d-flex justify-content-between messageHeader gap-4">
+                  <TypographyText :element="TypographyElements.P">{{
+                    message.user
+                  }}</TypographyText>
+                  <TypographyText :element="TypographyElements.P">{{
+                    message.time
+                  }}</TypographyText>
+                </div>
+                <TypographyText
+                  class="messageContent"
+                  color="#000000"
+                  :element="TypographyElements.P"
+                  >{{ message.content }}</TypographyText
+                >
+              </div>
+            </div>
+          </div>
+          <div class="form-floating d-flex">
+            <InputField
+              id="messageInput"
+              className="form-control"
+              label="Сообщение"
+              placeholder="Сообщение"
+              v-model="messageModel"
+            />
+            <button
+              class="btn btn-outline-secondary"
+              style="width: 30%"
+              @click="handleSendMessage('text')"
+            >
+              Отправить
+            </button>
+          </div>
         </div>
         <div
           class="users-container sideBlockContainer p-4"
-          :class="{
-            collapsed: !actions.showUsers,
-          }"
+          v-if="actions.showUsers"
         >
           <TypographyText :element="TypographyElements.H4"
             >Участники</TypographyText
@@ -147,14 +226,11 @@ const disconnect = () => {
 .sideBlock {
   width: 30%;
   border-left: 1px solid #a9a9a9;
+  max-height: v-bind(sideBlockMaxHeight);
 }
 
 .sideBlock .sideBlockContainer {
   height: 100%;
-}
-
-.collapsed {
-  display: none;
 }
 
 .video {
@@ -167,5 +243,27 @@ const disconnect = () => {
 
 .video-row-2 {
   width: 49.5%;
+}
+
+.overflow-auto {
+  max-height: 100%;
+}
+
+.message {
+  border: 1px solid #a9a9a9;
+  border-radius: 15px;
+  background-color: #f8f8f8;
+  width: fit-content;
+  -webkit-box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.1);
+}
+
+.messageHeader {
+  font-size: 0.7rem !important;
+}
+
+.messageContent {
+  font-size: 0.8rem !important;
 }
 </style>

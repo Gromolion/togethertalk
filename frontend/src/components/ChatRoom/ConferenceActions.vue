@@ -38,14 +38,6 @@ const handleLeave = () => {
     </button>
     <button
       type="button"
-      id="enableDemonstration"
-      @click="actions.toggleDemonstration"
-      :class="{ active: actions.enableDemonstration }"
-    >
-      <i class="bi bi-display" />
-    </button>
-    <button
-      type="button"
       id="showChat"
       @click="actions.toggleChat"
       :class="{ active: actions.showChat }"
@@ -94,12 +86,7 @@ button:hover {
 }
 
 button.active {
-  border: 2px inset #a9a9a9;
-}
-
-#enableDemonstration.active {
-  background-color: #87ff67;
-  border: 1px solid #56a640;
+  border: 2px inset #a9a9a9 !important;
 }
 
 i {

@@ -1,7 +1,7 @@
 import useSocket from "@/hooks/useSocket";
 import usePeer from "@/hooks/usePeer";
 import { computed, reactive, Ref, ref, UnwrapNestedRefs, watch } from "vue";
-import { Video } from "@/components/ChatRoom/types";
+import { Message, Video } from "@/components/ChatRoom/types";
 import Peer, { MediaConnection } from "peerjs";
 // noinspection ES6UnusedImports
 import adapter from "webrtc-adapter";
@@ -16,6 +16,7 @@ export function useInitVideoChat(
   store: Store
 ) {
   const videos: Ref<Video[]> = ref([]);
+  const messages: Ref<Message[]> = ref([]);
 
   const socket = useSocket("chat-room", {
     extraHeaders: {
@@ -29,16 +30,18 @@ export function useInitVideoChat(
       video: true,
       audio: true,
     })
-    .then(onFulfilled(videos, socket, actions, store), onRejected());
+    .then(onFulfilled(videos, messages, socket, actions, store), onRejected());
 
   return {
     socket: socket,
     videos: videos,
+    chat: messages,
   };
 }
 
 function onFulfilled(
   videos: Ref<Video[]>,
+  messages: Ref<Message[]>,
   socket: Socket,
   actions: ChatActions,
   store: Store
@@ -154,6 +157,10 @@ function onFulfilled(
           video.enableAudio = body.enable;
         }
       });
+    });
+
+    socket.on("newMessage", (message) => {
+      messages.value.push(message);
     });
   };
 }
