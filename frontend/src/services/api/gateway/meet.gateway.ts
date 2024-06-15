@@ -1,12 +1,13 @@
 import MeetModel from "@/storage/modules/meet/MeetModel";
 import { METHODS, RequestManager } from "@/utils/request";
-import { array } from "jsonous";
+import { array, string } from "jsonous";
 import {
   meetDetailDecoder,
   MeetDetailInterface,
 } from "@/services/api/decoders/meet/meetDetailDecoder";
 import { orNull } from "@/services/api/decoders/commonDecoders";
 import { participantDecoder } from "@/services/api/decoders/meet/participantDecoder";
+import FilterModel from "@/storage/modules/report/FilterModel";
 
 export class MeetGateway {
   public static create(meetModel: MeetModel): Promise<MeetDetailInterface> {
@@ -39,18 +40,6 @@ export class MeetGateway {
         listAt: date,
         page: page,
         perPage: perPage,
-      },
-    });
-  }
-
-  public static detail(id: number): Promise<MeetDetailInterface> {
-    return RequestManager.createRequest({
-      url: "/meet",
-      method: METHODS.GET,
-      serverDataDecoder: meetDetailDecoder,
-    })({
-      body: {
-        id: id,
       },
     });
   }
@@ -100,6 +89,26 @@ export class MeetGateway {
         meetId: meetId,
         userId: userId,
       },
+    });
+  }
+
+  public static report(filter: FilterModel) {
+    return RequestManager.createRequest({
+      url: "/meet/report",
+      method: METHODS.GET,
+      serverDataDecoder: array(meetDetailDecoder),
+    })({
+      body: filter,
+    });
+  }
+
+  public static reportDownload(filter: FilterModel) {
+    return RequestManager.createRequest({
+      url: "/meet/report-download",
+      method: METHODS.GET,
+      serverDataDecoder: string,
+    })({
+      body: filter,
     });
   }
 }

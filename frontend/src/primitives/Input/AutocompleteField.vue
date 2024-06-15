@@ -30,7 +30,7 @@ watch(model, async (input: string) => {
 });
 
 const handleSelect = (item) => {
-  emit("selectItem", item.id);
+  emit("selectItem", item);
   model.value = "";
 };
 </script>

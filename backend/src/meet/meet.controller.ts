@@ -16,6 +16,7 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 import MeetDto from './dto/meet.dto';
 import { Request } from 'express';
 import ListDto from './dto/list.dto';
+import FilterDto from './dto/filter.dto';
 
 @Controller('meet')
 export class MeetController {
@@ -87,5 +88,12 @@ export class MeetController {
     @Req() req: Request,
   ) {
     return this.meetService.deleteParticipant(meetId, userId, req['user']);
+  }
+
+  @Get('report')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  report(@Query() filter: FilterDto, @Req() req: Request) {
+    return this.meetService.report(filter, req['user']);
   }
 }

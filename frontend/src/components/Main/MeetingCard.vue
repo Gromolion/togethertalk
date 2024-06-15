@@ -12,9 +12,15 @@ import PlanMeetingModal from "@/components/Main/PlanMeetingModal.vue";
 import MeetModel from "@/storage/modules/meet/MeetModel";
 import { MeetDetailInterface } from "@/services/api/decoders/meet/meetDetailDecoder";
 
-const props = defineProps<{
-  meet: MeetDetailInterface;
-}>();
+const props = withDefaults(
+  defineProps<{
+    meet: MeetDetailInterface;
+    withFullDate: boolean;
+  }>(),
+  {
+    withFullDate: false,
+  }
+);
 
 const meeting = ref(props.meet);
 
@@ -88,7 +94,13 @@ const handleRemoveParticipant = (id) => {
       color="#000206"
       :element="TypographyElements.P"
     >
-      В {{ moment(meeting.meetAt).format("H:mm") }}
+      {{
+        withFullDate
+          ? moment(meeting.meetAt).format("DD.MM.YYYY") +
+            " в " +
+            moment(meeting.meetAt).format("H:mm")
+          : "В " + moment(meeting.meetAt).format("H:mm")
+      }}
     </TypographyText>
     <div class="d-flex flex-column gap-2 mt-3">
       <AppLink
@@ -126,6 +138,7 @@ const handleRemoveParticipant = (id) => {
   <Suspense>
     <DetailAsyncModal
       v-if="detailModalOpened"
+      :withFullDate="withFullDate"
       :meet="meeting"
       @close="detailModalOpened = false"
       @cancel="handleCancel"

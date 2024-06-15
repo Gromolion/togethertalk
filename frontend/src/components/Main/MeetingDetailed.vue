@@ -11,10 +11,17 @@ import AppLink from "@/primitives/App/AppLink.vue";
 import { computed } from "vue";
 import AutocompleteField from "@/primitives/Input/AutocompleteField.vue";
 import { AutocompleteTypes } from "@/enums/autocompleteTypes";
+import * as moment from "moment-timezone";
 
-const props = defineProps<{
-  meet: MeetDetailInterface;
-}>();
+const props = withDefaults(
+  defineProps<{
+    meet: MeetDetailInterface;
+    withFullDate: boolean;
+  }>(),
+  {
+    withFullDate: false,
+  }
+);
 
 const emit = defineEmits([
   "close",
@@ -26,9 +33,12 @@ const emit = defineEmits([
 const store = useStore();
 const user = computed(() => store.state.auth.user);
 
-const handleAddParticipant = async (id) => {
+const handleAddParticipant = async (item) => {
   try {
-    const participant = await MeetGateway.addParticipant(props.meet.id, id);
+    const participant = await MeetGateway.addParticipant(
+      props.meet.id,
+      item.id
+    );
     emit("addParticipant", participant);
   } catch (e) {
     await store.dispatch("toast/new", {
@@ -61,9 +71,20 @@ const excludeAutocompleteIds = computed(() =>
 <template>
   <BaseModal @close="$emit('close')" modal-width="840px">
     <div class="p-2">
-      <TypographyText class="mb-3" :element="TypographyElements.H5">
-        {{ meet.theme }}
-      </TypographyText>
+      <div class="d-flex mb-3 justify-content-between">
+        <TypographyText :element="TypographyElements.H5">
+          {{ meet.theme }}
+        </TypographyText>
+        <TypographyText :element="TypographyElements.H5">
+          {{
+            withFullDate
+              ? moment(meet.meetAt).format("DD.MM.YYYY") +
+                " в " +
+                moment(meet.meetAt).format("H:mm")
+              : "В " + moment(meet.meetAt).format("H:mm")
+          }}
+        </TypographyText>
+      </div>
       <TypographyText class="mb-3" :element="TypographyElements.P">
         Инициатор: {{ meet.initiator.firstName }} {{ meet.initiator.lastName }}
       </TypographyText>

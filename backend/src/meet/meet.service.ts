@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,9 +13,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { hash } from 'bcrypt';
 import * as moment from 'moment-timezone';
 import { UserService } from '../user/user.service';
+import FilterDto from './dto/filter.dto';
 
 @Injectable()
 export class MeetService {
+  private logger = new Logger();
   constructor(
     @InjectRepository(Meet) private readonly meetRepository: Repository<Meet>,
     private userService: UserService,
@@ -265,5 +268,67 @@ export class MeetService {
     );
 
     await this.meetRepository.save(meet);
+  }
+
+  public async report(filter: FilterDto, user: User) {
+    if (!user.isAdmin) {
+      throw new UnauthorizedException('Доступ запрещен');
+    }
+
+    const qb = this.meetRepository.createQueryBuilder('meet');
+
+    if (filter.dateFrom) {
+      qb.andWhere('meet.meetAt >= :dateFrom', {
+        dateFrom: moment(filter.dateFrom).unix(),
+      });
+    }
+    if (filter.dateTo) {
+      qb.andWhere('meet.meetAt <= :dateTo', {
+        dateTo: moment(filter.dateTo).unix(),
+      });
+    }
+
+    qb.leftJoinAndSelect('meet.participants', 'participants').leftJoinAndSelect(
+      'meet.initiator',
+      'initiator',
+    );
+
+    if (filter.users) {
+      const subQuery = this.meetRepository.manager
+        .createQueryBuilder()
+        .select('participants.meetId')
+        .from('meet_participants', 'participants')
+        .groupBy('participants.meetId')
+        .having('array_agg(participants.userId) @> :participantsIds')
+        .getQuery();
+
+      qb.andWhere(`meet.id in (${subQuery})`, {
+        participantsIds: filter.users,
+      });
+    }
+
+    return (
+      await qb
+        .offset((filter.page - 1) * filter.perPage)
+        .limit(filter.perPage)
+        .orderBy('meet.meetAt')
+        .getMany()
+    ).map((meet) => {
+      return {
+        id: meet.id,
+        theme: meet.theme,
+        description: meet.description,
+        initiator: meet.initiator,
+        participants: meet.participants.map((participant) => {
+          return {
+            id: participant.id,
+            firstName: participant.firstName,
+            lastName: participant.lastName,
+          };
+        }),
+        meetAt: moment.unix(meet.meetAt).format('YYYY-MM-DD HH:mm'),
+        hash: meet.hash,
+      };
+    });
   }
 }

@@ -19,6 +19,7 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
 import ResetPasswordByHashPage from "@/pages/ResetPasswordByHashPage.vue";
 import moment from "moment-timezone";
 import UsersPage from "@/pages/UsersPage.vue";
+import ReportPage from "@/pages/ReportPage.vue";
 
 const routes = [
   { path: AppRoutes.getMainUrl(), component: MainPage },
@@ -41,6 +42,7 @@ const routes = [
   },
   { path: AppRoutes.getChatRoomUrl(), component: ChatRoom },
   { path: AppRoutes.getUsersUrl(), component: UsersPage },
+  { path: AppRoutes.getReportUrl(), component: ReportPage },
   { path: "/:pathMatch(.*)*", redirect: AppRoutes.getMainUrl() },
 ];
 
