@@ -17,7 +17,7 @@ export class UserService {
 
   async createOrUpdate(dto: UserDto, currentUser: User) {
     if (!currentUser.isAdmin && dto.id !== currentUser.id) {
-      throw new UnauthorizedException('Доступ запрещен');
+      throw new BadRequestException('Доступ запрещен');
     }
 
     let user: User;
@@ -56,7 +56,7 @@ export class UserService {
 
   async delete(id: number, currentUser: User) {
     if (!currentUser.isAdmin) {
-      throw new UnauthorizedException('Доступ запрещен');
+      throw new BadRequestException('Доступ запрещен');
     }
 
     const user = await this.find(id);
@@ -113,7 +113,7 @@ export class UserService {
 
   async setAvatar(id: number, avatar: Express.Multer.File, currentUser: User) {
     if (!currentUser.isAdmin && id !== currentUser.id) {
-      throw new UnauthorizedException('Доступ запрещен');
+      throw new BadRequestException('Доступ запрещен');
     }
 
     const user = await this.find(id);
@@ -131,7 +131,7 @@ export class UserService {
 
   async removeAvatar(id: number, currentUser: User) {
     if (!currentUser.isAdmin && id !== currentUser.id) {
-      throw new UnauthorizedException('Доступ запрещен');
+      throw new BadRequestException('Доступ запрещен');
     }
 
     const user = await this.find(id);

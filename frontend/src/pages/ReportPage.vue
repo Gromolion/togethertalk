@@ -5,13 +5,15 @@ import FilterModel from "@/storage/modules/report/FilterModel";
 import InputField from "@/primitives/Input/InputField.vue";
 import { AutocompleteTypes } from "@/enums/autocompleteTypes";
 import AutocompleteField from "@/primitives/Input/AutocompleteField.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import moment from "moment-timezone";
 import MeetingCard from "@/components/Main/MeetingCard.vue";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 import { ToastsTypes } from "@/enums/toastsTypes";
 import { useStore } from "vuex";
 import { saveFileToUser } from "@/utils/file";
+import PaginationBar from "@/primitives/Pagination/PaginationBar.vue";
+import { usePagination } from "@/primitives/Pagination/hooks";
 
 const store = useStore();
 
@@ -19,16 +21,21 @@ const model = new FilterModel();
 const users = ref([]);
 
 const list = ref([]);
+const totalCount = ref(0);
+
+const pagination = usePagination(8);
 const loading = ref(false);
 
 const handleReport = async () => {
   loading.value = true;
 
-  model.page = 1;
-  model.perPage = 10;
+  model.page = pagination.currentPage.value;
+  model.perPage = pagination.perPage.value;
   model.users = users.value.map((user) => user.id);
   try {
-    list.value = await MeetGateway.report(model);
+    const report = await MeetGateway.report(model);
+    list.value = report.list;
+    totalCount.value = report.totalCount;
     loading.value = false;
   } catch (e) {
     loading.value = false;
@@ -41,11 +48,13 @@ const handleReport = async () => {
   }
 };
 
+watch(() => pagination, handleReport, { deep: true });
+
 const handleReportDownload = async () => {
   loading.value = true;
 
-  model.page = 1;
-  model.perPage = 10;
+  model.page = pagination.currentPage.value;
+  model.perPage = pagination.perPage.value;
   model.users = users.value.map((user) => user.id);
   try {
     saveFileToUser("report.xlsx", await MeetGateway.reportDownload(model));
@@ -150,7 +159,7 @@ const handleSelectUser = (item) => users.value.push(item);
         Выгрузить
       </button>
     </div>
-    <div class="list d-flex flex-wrap">
+    <div class="list d-flex flex-wrap mb-3">
       <div
         class="meetingCard"
         v-for="meet in list.sort(
@@ -167,6 +176,7 @@ const handleSelectUser = (item) => users.value.push(item);
         />
       </div>
     </div>
+    <PaginationBar :totalCount="totalCount" :perPageMultiplier="8" />
   </div>
 </template>
 

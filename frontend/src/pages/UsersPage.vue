@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import { TypographyElements } from "@/primitives/Typography/enum";
 import TypographyText from "@/primitives/Typography/TypographyText.vue";
-import { Ref, ref } from "vue";
+import { computed, Ref, ref, watch } from "vue";
 import UserGateway from "@/services/api/gateway/user.gateway";
 import { UserInterface } from "@/services/api/decoders/user/userDecoder";
 import UserCreateModal from "@/components/User/UserCreateModal.vue";
 import UserCard from "@/components/User/UserCard.vue";
+import PaginationBar from "@/primitives/Pagination/PaginationBar.vue";
+import { usePagination } from "@/primitives/Pagination/hooks";
 
 const list: Ref<UserInterface[]> = ref([]);
 const totalCount = ref(0);
 
-UserGateway.list(1, 10).then((res) => {
-  list.value = res.users;
-  totalCount.value = res.totalCount;
-});
+const pagination = computed(() => usePagination(10));
+
+watch(
+  pagination,
+  ({ currentPage, perPage }) => {
+    UserGateway.list(currentPage.value, perPage.value).then((res) => {
+      list.value = res.users;
+      totalCount.value = res.totalCount;
+    });
+  },
+  { immediate: true, deep: true }
+);
 
 const createModalOpened = ref(false);
 </script>
@@ -27,7 +37,7 @@ const createModalOpened = ref(false);
     >
       Сотрудники
     </TypographyText>
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-end mb-3">
       <button
         class="btn btn-outline-secondary px-4 py-2"
         @click="createModalOpened = true"
@@ -35,9 +45,10 @@ const createModalOpened = ref(false);
         Создать
       </button>
     </div>
-    <div class="row list">
+    <div class="row list mb-3">
       <UserCard v-for="user in list" :key="user.id" :user="user" />
     </div>
+    <PaginationBar :totalCount="totalCount" :perPageMultiplier="10" />
     <UserCreateModal
       v-if="createModalOpened"
       @close="createModalOpened = false"

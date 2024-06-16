@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Meet } from '../entities/meet.entity';
@@ -224,7 +220,7 @@ export class MeetService {
     }
 
     if (!user.isAdmin && meet.initiator.id !== user.id) {
-      throw new UnauthorizedException('Доступ запрещен');
+      throw new BadRequestException('Доступ запрещен');
     }
 
     const participant = await this.userService.find(userId);
@@ -264,7 +260,7 @@ export class MeetService {
     }
 
     if (!user.isAdmin && meet.initiator.id !== user.id) {
-      throw new UnauthorizedException('Доступ запрещен');
+      throw new BadRequestException('Доступ запрещен');
     }
 
     meet.participants = meet.participants.filter(
@@ -276,7 +272,7 @@ export class MeetService {
 
   public async report(filter: FilterDto, user: User) {
     if (!user.isAdmin) {
-      throw new UnauthorizedException('Доступ запрещен');
+      throw new BadRequestException('Доступ запрещен');
     }
 
     const qb = this.meetRepository.createQueryBuilder('meet');
@@ -311,7 +307,7 @@ export class MeetService {
       });
     }
 
-    return (
+    const list = (
       await qb
         .offset((filter.page - 1) * filter.perPage)
         .limit(filter.perPage)
@@ -334,10 +330,15 @@ export class MeetService {
         hash: meet.hash,
       };
     });
+
+    return {
+      list: list,
+      totalCount: await qb.getCount(),
+    };
   }
 
   async reportDownload(filter: FilterDto, user: User) {
-    const meets = await this.report(filter, user);
+    const { list } = await this.report(filter, user);
 
     const workbook = new excel.Workbook();
     const worksheet = workbook.addWorksheet('Встречи');
@@ -364,7 +365,7 @@ export class MeetService {
     worksheet.cell(1, 6).string('Участники').style(headerStyle);
     worksheet.cell(1, 7).string('Хеш').style(headerStyle);
 
-    meets.forEach((meet, i) => {
+    list.forEach((meet, i) => {
       worksheet.cell(i + 2, 1).number(meet.id);
       worksheet.cell(i + 2, 2).string(meet.theme);
       worksheet.cell(i + 2, 3).string(meet.description);

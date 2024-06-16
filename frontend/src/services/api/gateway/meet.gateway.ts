@@ -1,6 +1,6 @@
 import MeetModel from "@/storage/modules/meet/MeetModel";
 import { METHODS, RequestManager } from "@/utils/request";
-import { array, string } from "jsonous";
+import { string } from "jsonous";
 import {
   meetDetailDecoder,
   MeetDetailInterface,
@@ -100,7 +100,7 @@ export class MeetGateway {
     return RequestManager.createRequest({
       url: "/meet/report",
       method: METHODS.GET,
-      serverDataDecoder: array(meetDetailDecoder),
+      serverDataDecoder: meetListDecoder,
     })({
       body: filter,
     });

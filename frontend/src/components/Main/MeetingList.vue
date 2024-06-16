@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MeetingCard from "@/components/Main/MeetingCard.vue";
 import PlanMeetingModal from "@/components/Main/PlanMeetingModal.vue";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 import moment from "moment-timezone";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 import PaginationBar from "@/primitives/Pagination/PaginationBar.vue";
