@@ -17,12 +17,12 @@ const pagination = computed(() => usePagination(8));
 watch(
   pagination,
   ({ currentPage, perPage }) => {
-    MeetGateway.listForDate(currentDate, currentPage.value, perPage.value).then(
-      (res) => {
+    MeetGateway.listForDate(currentDate, currentPage.value, perPage.value)
+      .then((res) => {
         list.value = res.list;
         totalCount.value = res.totalCount;
-      }
-    );
+      })
+      .catch(() => (list.value = []));
   },
   { immediate: true, deep: true }
 );

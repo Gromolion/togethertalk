@@ -24,13 +24,15 @@ watch(
       moment(date.value).format("YYYY-MM-DD"),
       pagination.value.currentPage.value,
       pagination.value.perPage.value
-    ).then((res) => {
-      list.value = res.list.sort(
-        (meet1, meet2) =>
-          moment(meet1.meetAt).unix() - moment(meet2.meetAt).unix()
-      );
-      totalCount.value = res.totalCount;
-    });
+    )
+      .then((res) => {
+        list.value = res.list.sort(
+          (meet1, meet2) =>
+            moment(meet1.meetAt).unix() - moment(meet2.meetAt).unix()
+        );
+        totalCount.value = res.totalCount;
+      })
+      .catch(() => (list.value = []));
   },
   {
     deep: true,

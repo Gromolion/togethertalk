@@ -15,4 +15,3 @@ COPY . .
 
 EXPOSE 8080
 CMD /bin/bash -c "npm init -y; npm install; npm run serve"
-#CMD ["npm", "run", "serve"]

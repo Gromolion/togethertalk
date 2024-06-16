@@ -28,11 +28,13 @@ if (!roomId) {
   router.back();
 }
 
-MeetGateway.getByHash(roomId).then((meet) => {
-  if (!meet) {
-    router.back();
-  }
-});
+MeetGateway.getByHash(roomId)
+  .then((meet) => {
+    if (!meet) {
+      router.back();
+    }
+  })
+  .catch(() => router.back());
 
 const videoChat = computed(() => useInitVideoChat(roomId, actions, store));
 

@@ -17,10 +17,12 @@ const pagination = computed(() => usePagination(10));
 watch(
   pagination,
   ({ currentPage, perPage }) => {
-    UserGateway.list(currentPage.value, perPage.value).then((res) => {
-      list.value = res.users;
-      totalCount.value = res.totalCount;
-    });
+    UserGateway.list(currentPage.value, perPage.value)
+      .then((res) => {
+        list.value = res.users;
+        totalCount.value = res.totalCount;
+      })
+      .catch(() => (list.value = []));
   },
   { immediate: true, deep: true }
 );

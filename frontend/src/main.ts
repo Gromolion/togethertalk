@@ -81,10 +81,15 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-initMiddlewares(store);
+initMiddlewares(store, router);
 
 RequestManager.baseUrl = process.env.VUE_APP_API_URL;
 
 moment.tz.setDefault("Europe/Moscow");
+
+app.config.warnHandler = () => {};
+app.config.errorHandler = (err, instance, info) => {
+  console.log(err, info);
+};
 
 app.mount("#app");
