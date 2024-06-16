@@ -10,10 +10,4 @@ export default registerAs('database', () => ({
     database: process.env.POSTGRES_DB_NAME,
     synchronize: !!process.env.SYNCHRONIZE_ENTITIES,
   },
-  mongo: {
-    port: parseInt(process.env.MONGO_PORT) || 27017,
-    host: process.env.MONGO_HOST,
-    user: process.env.MONGO_USER,
-    password: process.env.MONGO_PASSWORD,
-  },
 }));

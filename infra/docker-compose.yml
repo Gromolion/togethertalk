@@ -26,7 +26,6 @@ services:
       - ../backend:/usr/src/app
     depends_on:
       - postgres
-      - mongo
     restart: always
     ports:
       - "3000:3000"
@@ -48,14 +47,3 @@ services:
       retries: 5
       start_period: 10s
     restart: unless-stopped
-  mongo:
-    image: mongo:latest
-    container_name: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: togethertalk
-      MONGO_INITDB_ROOT_PASSWORD: togethertalk
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./databases/mongo:/data/db
