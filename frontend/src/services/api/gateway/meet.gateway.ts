@@ -8,6 +8,10 @@ import {
 import { orNull } from "@/services/api/decoders/commonDecoders";
 import { participantDecoder } from "@/services/api/decoders/meet/participantDecoder";
 import FilterModel from "@/storage/modules/report/FilterModel";
+import {
+  meetListDecoder,
+  MeetListInterface,
+} from "@/services/api/decoders/meet/meetListDecoder";
 
 export class MeetGateway {
   public static create(meetModel: MeetModel): Promise<MeetDetailInterface> {
@@ -30,11 +34,11 @@ export class MeetGateway {
     date: string,
     page: number,
     perPage: number
-  ): Promise<MeetDetailInterface[]> {
+  ): Promise<MeetListInterface> {
     return RequestManager.createRequest({
       url: "/meet/list",
       method: METHODS.GET,
-      serverDataDecoder: array(meetDetailDecoder),
+      serverDataDecoder: meetListDecoder,
     })({
       body: {
         listAt: date,

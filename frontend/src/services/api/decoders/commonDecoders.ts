@@ -1,4 +1,4 @@
-import Decoder from "jsonous";
+import Decoder, { succeed } from "jsonous";
 import { err, ok } from "resulty";
 import { isNil } from "ramda";
 
@@ -10,18 +10,3 @@ export function orNull<T>(decoder: Decoder<T>, defaultValue: T | null = null) {
     });
   });
 }
-
-export const fieldWithDefaultDecoder = <A>(
-  key: string,
-  decoder: Decoder<A>,
-  defaultValue: A | null = null
-) =>
-  new Decoder<A | null>((value: Record<string, any>) => {
-    if (isNil(value) || isNil(value[key])) {
-      return ok(defaultValue);
-    }
-    return decoder.decodeAny(value[key]).cata({
-      Ok: (value) => ok<string, A>(value),
-      Err: (error) => err<string, A>(error),
-    });
-  });

@@ -1,5 +1,4 @@
-import Decoder, { boolean, field, string, succeed } from "jsonous";
-import { fieldWithDefaultDecoder } from "@/services/api/decoders/commonDecoders";
+import Decoder, { succeed } from "jsonous";
 
 export interface ApiResponse<T> {
   success: boolean;

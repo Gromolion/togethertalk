@@ -125,10 +125,10 @@ export class MeetService {
       qb.andWhere('participants.id = :userId', { userId: user.id });
     }
 
-    return (
+    const list = (
       await qb
-        .offset((page - 1) * perPage)
-        .limit(perPage)
+        .skip((page - 1) * perPage)
+        .take(perPage)
         .getMany()
     ).map((meet) => {
       return {
@@ -147,6 +147,11 @@ export class MeetService {
         hash: meet.hash,
       };
     });
+
+    return {
+      list,
+      totalCount: await qb.getCount(),
+    };
   }
 
   public async cancel(id: number, user: User) {

@@ -1,15 +1,31 @@
 <script setup lang="ts">
 import MeetingCard from "@/components/Main/MeetingCard.vue";
 import PlanMeetingModal from "@/components/Main/PlanMeetingModal.vue";
-import { ref } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import moment from "moment-timezone";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
+import PaginationBar from "@/primitives/Pagination/PaginationBar.vue";
+import { usePagination } from "@/primitives/Pagination/hooks";
 
 const showPlanModal = ref(false);
 const currentDate = moment().format("YYYY-MM-DD HH:mm");
 const list = ref([]);
+const totalCount = ref(0);
 
-MeetGateway.listForDate(currentDate, 1, 10).then((res) => (list.value = res));
+const pagination = computed(() => usePagination(8));
+
+watch(
+  pagination,
+  ({ currentPage, perPage }) => {
+    MeetGateway.listForDate(currentDate, currentPage.value, perPage.value).then(
+      (res) => {
+        list.value = res.list;
+        totalCount.value = res.totalCount;
+      }
+    );
+  },
+  { immediate: true, deep: true }
+);
 
 const onAdd = (meet) => {
   list.value.push(meet);
@@ -47,6 +63,7 @@ const onChange = (source) => {
       <MeetingCard :meet="meet" @cancel="onCancel" @change="onChange" />
     </div>
   </div>
+  <PaginationBar :totalCount="totalCount" :perPageMultiplier="8" />
   <PlanMeetingModal
     v-if="showPlanModal"
     @close="showPlanModal = false"

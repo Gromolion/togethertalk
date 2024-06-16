@@ -1,26 +1,41 @@
 <script setup lang="ts">
 import MeetingCard from "@/components/Main/MeetingCard.vue";
 import DatePicker from "@/primitives/Calendar/DatePicker.vue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import moment from "moment-timezone";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 import PlanMeetingModal from "@/components/Main/PlanMeetingModal.vue";
+import { usePagination } from "@/primitives/Pagination/hooks";
+import PaginationBar from "@/primitives/Pagination/PaginationBar.vue";
 
 const selectedDate = ref(null);
 const onCalendarSelect = (date) => (selectedDate.value = date);
 
 const showPlanModal = ref(false);
 const list = ref([]);
+const totalCount = ref(0);
 
-watch(selectedDate, (date) => {
-  MeetGateway.listForDate(moment(date).format("YYYY-MM-DD"), 1, 10).then(
-    (res) =>
-      (list.value = res.sort(
+const pagination = computed(() => usePagination(4));
+
+watch(
+  () => [selectedDate, pagination],
+  ([date, pagination]) => {
+    MeetGateway.listForDate(
+      moment(date.value).format("YYYY-MM-DD"),
+      pagination.value.currentPage.value,
+      pagination.value.perPage.value
+    ).then((res) => {
+      list.value = res.list.sort(
         (meet1, meet2) =>
           moment(meet1.meetAt).unix() - moment(meet2.meetAt).unix()
-      ))
-  );
-});
+      );
+      totalCount.value = res.totalCount;
+    });
+  },
+  {
+    deep: true,
+  }
+);
 
 const onAdd = (meet) => {
   list.value.push(meet);
@@ -61,6 +76,7 @@ const onChange = (source) => {
           <MeetingCard :meet="meet" @cancel="onCancel" @change="onChange" />
         </div>
       </div>
+      <PaginationBar :totalCount="totalCount" :perPageMultiplier="4" />
     </div>
     <PlanMeetingModal
       v-if="showPlanModal"
