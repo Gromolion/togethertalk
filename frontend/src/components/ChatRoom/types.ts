@@ -11,7 +11,7 @@ export type Video = {
 export type Message = {
   user: string;
   type: "text" | "file";
-  content: string;
+  content: string | { name: string; content: string };
   time: string;
   mine: boolean;
 };

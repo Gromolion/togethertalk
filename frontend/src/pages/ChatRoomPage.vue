@@ -12,6 +12,11 @@ import ChatMember from "@/components/ChatRoom/ChatMember.vue";
 import { MeetGateway } from "@/services/api/gateway/meet.gateway";
 import InputField from "@/primitives/Input/InputField.vue";
 import moment from "moment-timezone";
+import { ToastsTypes } from "@/enums/toastsTypes";
+import { prepareFileUploader } from "@/utils/request/prepareFileUploader";
+import UserGateway from "@/services/api/gateway/user.gateway";
+import AppRoutes from "@/storage/appState/appRoutes";
+import { convertFileToBase64 } from "@/utils/file";
 
 const route = useRoute();
 const router = useRouter();
@@ -60,11 +65,11 @@ const disconnect = () => {
 };
 
 const messageModel = ref("");
-const handleSendMessage = (type: string) => {
+const handleSendMessage = () => {
   videoChat.value.chat.value.push({
     user:
       store.state.auth.user.firstName + " " + store.state.auth.user.lastName,
-    type: type,
+    type: "text",
     content: messageModel.value,
     time: moment().format("H:mm"),
     mine: true,
@@ -72,10 +77,12 @@ const handleSendMessage = (type: string) => {
   videoChat.value.socket.emit("sendMessage", {
     user:
       store.state.auth.user.firstName + " " + store.state.auth.user.lastName,
-    type: type,
+    type: "text",
     content: messageModel.value,
     time: moment().format("H:mm"),
   });
+
+  messageModel.value = "";
 };
 
 const videoGridEl = ref(null);
@@ -96,6 +103,49 @@ onMounted(() => {
   resizeObserver.value?.observe(videoGridEl.value);
 });
 onBeforeUnmount(() => resizeObserver.value?.unobserve(videoGridEl.value));
+
+const fileInput = ref(null);
+const handleFileSend = async () => {
+  fileInput.value.$el.nextSibling.click();
+
+  fileInput.value.$el.nextSibling.onchange = async (e) => {
+    const file = e.target.files[0];
+
+    if (file.size >= 3145728) {
+      await store.dispatch("toast/new", {
+        message: "Вес файла не должен превышать 3 Mb",
+        type: ToastsTypes.ERROR,
+      });
+
+      return;
+    }
+
+    const content = await convertFileToBase64(file);
+
+    videoChat.value.chat.value.push({
+      user:
+        store.state.auth.user.firstName + " " + store.state.auth.user.lastName,
+      type: "file",
+      content: {
+        name: file.name,
+        content: content,
+      },
+      time: moment().format("H:mm"),
+      mine: true,
+    });
+
+    videoChat.value.socket.emit("sendMessage", {
+      user:
+        store.state.auth.user.firstName + " " + store.state.auth.user.lastName,
+      type: "file",
+      content: {
+        name: file.name,
+        content: content,
+      },
+      time: moment().format("H:mm"),
+    });
+  };
+};
 </script>
 
 <template>
@@ -156,29 +206,50 @@ onBeforeUnmount(() => resizeObserver.value?.unobserve(videoGridEl.value));
                 </div>
                 <TypographyText
                   class="messageContent"
+                  v-if="message.type !== 'file'"
                   color="#000000"
                   :element="TypographyElements.P"
                   >{{ message.content }}</TypographyText
                 >
+                <a
+                  v-else
+                  :download="message.content.name"
+                  :href="message.content.content"
+                >
+                  {{ message.content.name }}
+                </a>
               </div>
             </div>
           </div>
-          <div class="form-floating d-flex">
+          <form
+            @submit.prevent="handleSendMessage"
+            class="form-floating d-flex"
+          >
             <InputField
               id="messageInput"
               className="form-control"
               label="Сообщение"
               placeholder="Сообщение"
+              style="padding-right: 32px"
               v-model="messageModel"
             />
+            <button class="sendFileBtn" type="button" @click="handleFileSend">
+              <i class="bi bi-paperclip" />
+              <InputField
+                ref="fileInput"
+                id="fileInput"
+                type="file"
+                className="visually-hidden"
+              />
+            </button>
             <button
+              type="submit"
               class="btn btn-outline-secondary"
               style="width: 30%"
-              @click="handleSendMessage('text')"
             >
               Отправить
             </button>
-          </div>
+          </form>
         </div>
         <div
           class="users-container sideBlockContainer p-4"
@@ -254,9 +325,6 @@ onBeforeUnmount(() => resizeObserver.value?.unobserve(videoGridEl.value));
   border-radius: 15px;
   background-color: #f8f8f8;
   width: fit-content;
-  -webkit-box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.1);
-  box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.1);
 }
 
 .messageHeader {
@@ -265,5 +333,18 @@ onBeforeUnmount(() => resizeObserver.value?.unobserve(videoGridEl.value));
 
 .messageContent {
   font-size: 0.8rem !important;
+}
+
+.sendFileBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: absolute;
+  right: 30%;
+  height: 100%;
+}
+
+.sendFileBtn i {
+  font-size: 1.5rem;
 }
 </style>

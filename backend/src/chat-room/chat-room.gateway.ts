@@ -80,7 +80,7 @@ export class ChatRoomGateway implements OnGatewayDisconnect {
     body: {
       user: string;
       type: 'text' | 'file';
-      content: string;
+      content: string | { name: string; content: string };
       time: string;
     },
   ) {
