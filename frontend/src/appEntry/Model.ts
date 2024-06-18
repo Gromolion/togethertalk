@@ -22,6 +22,8 @@ export default abstract class Model {
   get isValid() {
     const classValidatorErrors = validateSync(this);
 
+    console.log(classValidatorErrors);
+
     if (classValidatorErrors.length !== 0) {
       this.validationResult = this.getResultByErrors(classValidatorErrors);
       return this.validationResult.valid;

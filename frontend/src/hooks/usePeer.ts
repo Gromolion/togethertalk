@@ -1,6 +1,7 @@
 import Peer from "peerjs";
 
 export default function (id: string, token: string, path?: string) {
+  // return new Peer(id);
   return new Peer(id, {
     path: path,
     host: "localhost",

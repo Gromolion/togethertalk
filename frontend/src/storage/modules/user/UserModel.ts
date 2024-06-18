@@ -1,24 +1,29 @@
 import Model from "@/appEntry/Model";
-import { IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 import { UserInterface } from "@/services/api/decoders/user/userDecoder";
 
 export default class UserModel extends Model {
   public id = 0;
 
   @IsString()
-  login: string;
+  @IsNotEmpty()
+  login: string = "";
 
   @IsString()
-  password: string;
+  @IsNotEmpty()
+  password: string = "";
 
   @IsString()
-  firstName: string;
+  @IsNotEmpty()
+  firstName: string = "";
 
   @IsString()
-  lastName: string;
+  @IsNotEmpty()
+  lastName: string = "";
 
   @IsString()
-  email: string;
+  @IsNotEmpty()
+  email: string = "";
 
   position: string;
 

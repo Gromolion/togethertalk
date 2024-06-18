@@ -8,7 +8,7 @@ export const userDecoder = succeed({})
   .assign("email", field("email", string))
   .assign("firstName", field("firstName", string))
   .assign("lastName", field("lastName", string))
-  .assign("position", field("position", string))
+  .assign("position", orNull(field("position", string)))
   .assign("roles", field("roles", array(string)))
   .assign("avatar", field("avatar", orNull(string)));
 

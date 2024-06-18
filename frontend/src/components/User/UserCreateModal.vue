@@ -27,6 +27,11 @@ const togglePassword = ref(false);
 const togglePasswordIconHovered = ref(false);
 
 const onSubmit = async () => {
+  if (!model.value.isValid) {
+    console.log(model.validationResult);
+    return;
+  }
+
   try {
     loading.value = true;
 
